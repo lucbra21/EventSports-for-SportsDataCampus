@@ -1,0 +1,2764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Estilos -->
+<link rel="stylesheet" href="./plugins/bootstrap-4.5.3/css/bootstrap.css">
+<link rel="stylesheet" href="./plugins/fontawesome-free-6.4.2-web/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="./plugins/DataTables/datatables.css">
+
+<!-- JS -->
+<script src="./js/ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.min.js"></script>
+<script type="text/javascript" charset="utf8" src="./plugins/DataTables/datatables.js"></script>
+<script src="./js/cdnjs.cloudflare.com_ajax_libs_popper.js_1.16.0_umd_popper.min.js"></script>
+<script src="./plugins/bootstrap-4.5.3/js/bootstrap.min.js"></script>
+<script src="./js/cdnjs.cloudflare.com_ajax_libs_xlsx_0.16.9_xlsx.full.min.js"></script>
+<script src="./js/cdnjs.cloudflare.com_ajax_libs_Sortable_1.14.0_Sortable.min.js"></script>
+<!-- <script src="./plugins/fontawesome-free-6.4.2-web/js/all.min.js" crossorigin="anonymous"></script> -->
+
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campograma de Fútbol</title>
+    <style>
+        #campo {
+            position: relative;  /* Asegúrate de que el contenedor del campo tenga posición relativa */
+            width: 500px;        /* Un ancho fijo para el campo */
+            height: 300px;
+            margin: 0 auto;      /* Centra el campo horizontalmente */
+            background-image: url('./img/campo.png');
+            background-size: 500px 300px;  /* Tamaño fijo para la imagen de fondo */
+            background-repeat: no-repeat;
+            
+        }
+
+
+        .area-accion {
+            width: 420px;  /* Ajusta al contenido */
+            height: 300px; /* Ajusta al contenido */
+            /* background-color: #e0e0e0; /* Color de fondo del área de acción */
+            padding: 5mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            position: relative;  /* Asegúrate de que el contenedor del campo tenga posición relativa */
+        }
+
+        #porteria {
+            width: 420px;  /* Ancho total, incluyendo la portería y el espacio alrededor */
+            height: 300px; /* Alto total, incluyendo la portería y el espacio por encima y por debajo */
+            padding: 5mm; /* Esto efectivamente añade un "borde" al contenido interno */
+            background-image: url('./img/porteria.png');
+            background-size: cover;
+            background-position: center;
+            background-clip: border-box; /* Esta propiedad asegura que el fondo (la imagen) también cubre el área del padding */
+            position: relative;  /* Asegúrate de que el contenedor del campo tenga posición relativa */
+        }
+
+        .linea-vertical {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background-color: white;
+            left: 50%;
+            top: 0;
+        }
+
+        .area-left, .area-right {
+            position: absolute;
+            height: 100px;
+            width: 50px;
+            background-color: transparent;
+            top: 50%;
+            transform: translateY(-50%);
+            border-style: solid;
+            border-width: 1px 1px 1px 0;
+            border-color: white;
+        }
+
+        .area-left {
+            left: 0;
+        }
+
+        .area-right {
+            right: 0;
+            border-width: 1px 0 1px 1px;
+        }
+
+        .circulo-central {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid white;
+            border-radius: 50%;
+        }
+        #acciones {
+            display: flex;
+            /* flex-direction: column; */
+            gap: 10px;
+        }
+        
+        .btn-accion {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-accion:hover {
+            background-color: #45a049;
+        }
+
+        .youtube-player-container iframe {
+            width: 100%;
+            height: 300px;
+        }
+
+
+        #acciones button {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .list-group-item {
+            margin-bottom: 5px;
+        }
+
+        .nombre-equipo {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        #editableTable {
+            border-collapse: separate;
+            border-spacing: 0 5px;
+            font-size: 9px;
+        }
+
+        #editableTable thead tr {
+            border: none;
+        }
+
+        #editableTable th, #editableTable td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+        }
+
+        #editableTable tbody tr:hover {
+            background-color: #f5f5f5; /* Color de fondo cuando pasas el mouse sobre una fila */
+        }
+
+        /* Estilo general para la tabla */
+        .fixed-header {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        /* Fijamos el encabezado */
+        .fixed-header thead {
+            display: block;
+        }
+
+        /* Hacemos que el cuerpo de la tabla sea desplazable */
+        .fixed-header tbody {
+            display: block;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        /* Definimos los anchos específicos para cada columna */
+        .fixed-header th:nth-child(1), .fixed-header td:nth-child(1) { width: 5px; }
+        .fixed-header th:nth-child(2), .fixed-header td:nth-child(2) { width: 5px; }
+        .fixed-header th:nth-child(3), .fixed-header td:nth-child(3) { width: 20px; }
+        .fixed-header th:nth-child(4), .fixed-header td:nth-child(4) { width: 140px; }
+        .fixed-header th:nth-child(5), .fixed-header td:nth-child(5) { width: 140px; }
+        .fixed-header th:nth-child(6), .fixed-header td:nth-child(6) { width: 140px; }
+        .fixed-header th:nth-child(7), .fixed-header td:nth-child(7) { width: 40px; }
+        .fixed-header th:nth-child(8), .fixed-header td:nth-child(8) { width: 40px; }
+        .fixed-header th:nth-child(9), .fixed-header td:nth-child(9) { width: 40px; }
+        .fixed-header th:nth-child(10), .fixed-header td:nth-child(10) { width: 40px; }
+        .fixed-header th:nth-child(11), .fixed-header td:nth-child(11) { width: 40px; }
+        .fixed-header th:nth-child(12), .fixed-header td:nth-child(12) { width: 40px; }
+      
+
+        .fixed-header th, .fixed-header td {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+
+        /* Ajusta el ancho y diseño del botón de eliminar */
+        #editableTable button {
+            background: none;
+            border: none;
+            color: red;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+        #botonera {
+            position: relative;
+        }
+
+        #botonera button {
+            margin-right: 10px;
+        }
+
+        #botonera select {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+
+        /* Estilo para reducir el espacio entre los elementos de la lista */
+        .list-group-item {
+            padding: 0.1rem 0; /* Ajusta el relleno para que sea más pequeño */
+            background-color: transparent; /* Hace que el fondo de los elementos de la lista sea transparente */
+            border: none; /* Elimina el borde de los elementos de la lista */
+        }
+        
+        /* Estilo para los botones dentro de la lista para que ocupen todo el ancho */
+        .list-group-item .btn {
+            display: block; /* Hace que el botón ocupe todo el ancho */
+            width: 100%; /* Asegura que el botón ocupe todo el ancho */
+            margin: -0.55rem 0; /* Agrega un margen muy pequeño entre los botones */
+        }
+    
+        /* Hace que el fondo del contenedor sea transparente */
+        #acciones {
+            background-color: transparent;
+            border: none; /* Elimina el borde del contenedor */
+        }
+
+        .jugador.active {
+            background-color: #FFD700; /* Color dorado */
+            color: black;
+        }
+
+        
+
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .input-right {
+            text-align: right;
+            padding: 10px; /* Espaciado opcional para dar un poco de margen */
+        }
+
+    </style>
+</head>
+<body>
+    
+    
+
+    <div class="container-fluid mt-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Sección de Video -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="youtubeLink">Video:</label>
+                                    <div class="youtube-input-container d-flex align-items-center">
+                                        <input type="text" id="youtubeLink" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" class="form-control mr-2">
+                                        <button onclick="loadYouTubeVideo(0,0,0,0)" class="btn btn-info">
+                                            <i class="fa-brands fa-youtube"></i>
+                                        </button>
+                                        <button onclick="duplicarPantalla()" class="btn btn-info">
+                                            <i class="fas fa-unlink"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Sección de ID del Partido -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="youtubeLink">ID del Partido:</label>
+                                    <div class="youtube-input-container d-flex align-items-center">
+                                        <input type="text" id="matchID" placeholder="ID del partido" class="form-control mr-2">
+                                        <button onclick="GetDataMatch()" class="btn btn-info">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                        </button>
+                                        <button onclick="GetMatchID()" class="btn btn-info">
+                                            <i class="fas fa-redo"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección de ID del Partido -->
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>Fecha Partido:</label>
+                                    <div class="youtube-input-container d-flex align-items-center">
+                                        <input type="date" id="fecha" placeholder="Fecha del partido" class="form-control mr-2">
+                                    </div>
+                                </div>
+                            </div>
+        
+                             <!-- Sección de ID del Partido -->
+                             <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Descripción Partido:</label>
+                                    <div class="youtube-input-container d-flex align-items-center">
+                                        <input type="text" id="descripcion" placeholder="Descripción partido" class="form-control mr-2">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Período -->
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>Período:</label>
+                                    <select class="form-control" id="periodoSelector">
+                                        <!-- <option value="" selected>Seleccione</option> -->
+                                        <option value="1" selected>Periodo 1</option>
+                                        <option value="2">Periodo 2</option>
+                                    </select>
+                                </div>
+                            </div>
+        
+                            <!-- Sección de Timer -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Timer:</label>
+                                    <div class="input-group">
+                                        <!-- Botón Start (ícono de play) -->
+                                        <div class="input-group-prepend">
+                                            <button onclick="startTimer()" class="btn btn-success">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                        </div>
+                                        <!-- Botón Stop (ícono de stop) -->
+                                        <div class="input-group-prepend">
+                                            <button onclick="stopTimer()" class="btn btn-danger">
+                                                <i class="fas fa-stop"></i>
+                                            </button>
+                                        </div>
+                                        <!-- Botón Reset (ícono de redo) -->
+                                        <div class="input-group-prepend">
+                                            <button onclick="resetTimer()" class="btn btn-secondary">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                        <!-- Input para el timer -->
+                                        <input type="text" id="timerDisplay" class="form-control" style="text-align: center; font-weight: bold;" value="00:00" readonly ondblclick="editarTiempo()">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+        <div class="row mt-4">
+
+            <!-- Sección Izquierda (Reproductor, Campograma y Grilla) -->
+            <div class="col-md-12">
+                <div class="row">
+                    <!-- Reproductor de YouTube -->
+                    <div class="col-md-4 mb-2">
+                        <div class="youtube-player-container bg-light p-2 rounded shadow-sm">
+                         <iframe id="youtubePlayer" src="https://www.youtube.com/embed/DEFAULT_VIDEO_ID?enablejsapi=1" frameborder="0" allowfullscreen></iframe> 
+                            <div id="player" style="display:none"></div>
+                        </div>
+                    </div>
+                
+                     <!-- Campograma -->
+                     <div class="col-md-4 mb-2 d-flex justify-content-center align-items-center">
+                        <div id="campo" onclick="registrarAccion(event)" class="w-100 p-2 rounded justify-content-center align-items-center">
+                            <!-- Ejemplo de un punto en el 50% del ancho y 50% de la altura del campo -->
+                            <!-- <div class="punto" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div> -->
+                            <!-- Puedes agregar más puntos con diferentes coordenadas `left` y `top` -->
+                        </div>
+                        <div class="row"><div id="porteriaX"></div></div>
+                        <input type="hidden" id="porteria_X" value="">
+                        <input type="hidden" id="porteria_Y" value="">
+                    </div>
+                
+                    <!-- Sección Derecha (Acciones y Jugadores) -->
+                    <div class="col-md-4 mb-2  d-flex justify-content-center align-items-center">
+                        <!-- Acciones http://35.171.105.109/SDC/SDCKL/botonera/campo.png -->
+                        
+                            <div class="container">
+                                <div id="porterias">
+                                    <div class="area-accion">
+                                        <div id="porteria" class="porteria" onclick="registrarAccionPorteria(event)" style="w-100 p-2 rounded justify-content-center align-items-center">
+                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                    </div>
+                    
+
+                </div>
+                
+            
+                    
+                 <!-- Botonera players-->
+                 <!-- Inputs para los jugadores seleccionados -->
+                 <div class="row justify-content-center align-items-center">
+                    <div class="col-6">
+                        <input type="text" id="jugadorPrincipal" placeholder="Jugador Principal" class="btn btn-block" style="text-align: right;">
+                    </div>
+                    <div class="col-6">
+                        <input type="text" id="jugadorSecundario" placeholder="Jugador Secundario" class="btn btn-block" style="text-align: left;">
+                    </div>
+                </div>
+                 <div class="row">
+                    
+                    <input type="hidden" id="equipoJugadorPrincipal" readonly>
+
+                    <div class="col-md-12">
+                        <div class="container-fluid mt-3 mb-3" style="display: inline-block;">
+                            <!-- Contenedor general -->
+                           
+                                <div class="row">
+                                   
+                                        <!-- Jugadores del Equipo 1 (Home) -->
+                                        <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5>
+                                        <div id="equipo1" class="col-md-12">
+                                            <!-- Los botones del equipo 1 se generarán aquí, uno debajo del otro -->
+                                        </div>
+                                   
+                                </div>
+                                <div class="row">
+                                  
+                                        <!-- Jugadores del Equipo 2 (Away) -->
+                                        <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5>
+                                        <div id="equipo2" class="col-md-12">
+                                            <!-- Los botones del equipo 2 se generarán aquí, uno debajo del otro -->
+                                        </div>
+                                  
+                                    
+                                </div>
+                                
+                                
+                            </div>
+        
+                    </div>
+                </div>
+
+                <!-- Botonera action -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="bg-light p-2 rounded shadow-sm">
+                            <div id="acciones" class="mb-3 bg-light p-2 rounded shadow-sm">
+                    
+                                <div class="container">
+                                    
+                                    <div id="eventoSeleccionado" class="col-md-3 mb-3"></div>
+                                    <div class="row" id="botonera"></div>
+                                    <div class="col-md-12">
+                                        <div id="inputs"></div>
+                                    </div>
+
+                                    
+                                </div>
+                                
+
+                                
+                            </div>
+                            
+
+                            <input type="hidden" id="inputEvento" value="">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button id="btnReset" class="btn btn-secondary mb-2">Reset Event</button>
+                            </div>
+                            
+                            <div id="inputsAcciones">
+                                <!-- Aquí se agregarán los inputs de acciones dinámicamente -->
+                                
+                            </div>
+                                <input type="hidden" id="colorAccion" value="">
+                                <input type="hidden" id="eventName" value="">
+                                
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grilla -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="bg-light p-2 rounded shadow-sm">
+                            <table id="editableTable" class="display" style="width:100%">
+
+                                <thead class="bg-secondary text-white">
+                                    <tr style="text-align: center;">
+                                        <th ><i class="fas fa-play"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Edit" -->
+                                        <th ><i class="fas fa-trash"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Delete" -->
+                                        <th>eventID</th>
+                                        <th>Team</th>
+                                        <th>Player</th>
+                                        <th>Secundary</th>
+                                        <th>code</th>
+                                        <th>group</th>
+                                        <th>text</th>
+                                        <th>Periodo</th>
+                                        <th>Mins</th>
+                                        <th>Secs</th>
+                                        <th>startX</th>
+                                        <th>startY</th>
+                                        <th>endX</th>
+                                        <th>endY</th>
+                                        <th>porX</th>
+                                        <th>porY</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaRegistros" class="text-center">
+                                    <!-- Aquí se insertarán las filas automáticamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+        
+            
+        </div>
+
+        <div class="container-fluid mt-3 mb-3">
+                    <div class="card shadow-lg">
+                        <div class="card-body">
+                            <div class="row">
+                                
+                                    <div class="col-md-2" >
+                                        <div class="form-group">
+                                            <label>Código de la sesión</label>
+                                            <div class="d-flex ">
+                                                <input type="text" id="codigoSesion" placeholder="Código de la sesión" class="form-control ">
+                                                <button onclick="GetSesionID()" class="btn btn-info">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                        
+
+                                <div class="col-md-2">
+                                    <div class="btn-group" role="group">
+                                        <label class="btn  btn-block">
+                                            <input type="checkbox" id="autoSaveCheckbox"> <br>Auto guardado
+                                        </label>
+
+                                        <!-- Botón de exportación con ícono -->
+                                        <button onclick="descargarCSV()" class="btn btn-primary btn-block">
+                                            <i class="fas fa-file-download"></i><br>Grilla CSV
+                                        </button>
+
+                                       
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="btn-group" role="group">
+                                        <!-- Botón de exportación con ícono -->
+                                        <button onclick="guardarEstado('si')" class="btn btn-primary btn-block">
+                                            <i class="fas fa-save"></i><br>Guardar
+                                        </button>
+                                        <button onclick="blanquear()" class="btn btn-secondary" style="color: #fff;">
+                                            <i class="fas fa-trash"></i><br>Blanquear
+                                        </button>
+                                        <button onclick="enviarABaseDeDatos()" class="btn btn-secondary">
+                                            <i class="fas fa-play"></i><br>Enviar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="btn-group" role="group">
+                                        <!-- Botón de importación con ícono -->
+                                        <span class="btn btn-primary btn-file">
+                                            <i class="fas fa-upload"></i><br>Events
+                                            <input type="file" id="upload" onchange="handleFile()">
+                                        </span>
+                                    
+                                        <!-- Botón de exportación con ícono -->
+                                        <button id="exportModeloBotones" class="btn btn-secondary">
+                                            <i class="fas fa-file-download"></i><br>Modelo
+                                        </button>
+                                    
+                                        <!-- Botón de exportación con ícono -->
+                                        <button id="exportBotones" class="btn btn-secondary">
+                                            <i class="fas fa-file-download"></i><br>Exportar
+                                        </button>
+                                    </div>
+                                </div>
+                
+                                <div class="col-md-3">
+                                    <div class="btn-group" role="group">
+                                        <!-- Botón de importación con ícono -->
+                                        <input type="file" id="uploadJugadores" style="display:none" />
+                                        <button class="btn btn-primary btn-file" onclick="document.getElementById('uploadJugadores').click();">
+                                            <i class="fas fa-users"></i><br>Players
+                                        </button>
+                                    
+                
+                                        <!-- Botón de exportación con ícono -->
+                                        <button id="exportModeloJugadores" class="btn btn-secondary">
+                                            <i class="fas fa-file-download"></i><br>Modelo
+                                        </button>
+                                    
+                                        <!-- Botón de exportación con ícono -->
+                                        <button id="exportJugadores" class="btn btn-secondary">
+                                            <i class="fas fa-file-download"></i><br>Exportar
+                                        </button>
+                                    </div>
+                                </div>
+                
+                            </div>
+                        </div>
+                    </div>
+        </div>
+
+
+    </div>
+    
+<script>
+
+    const matchID = document.getElementById("matchID").value;
+    const codigoSesion = document.getElementById("codigoSesion").value;
+
+    let accionSeleccionada = null;
+
+    function registrarAccion(event) {
+
+        // const coords = getRelativePosition(document.getElementById("campo"), event);
+        // Si el clic fue hecho en un punto existente
+        // if (event.target.classList.contains('punto')) {
+        //     // event.stopPropagation();
+        //     // return; // Salir de la función
+        //     startPoint.x = coords.x;
+        //     startPoint.y = coords.y;
+        // }
+
+        accionSeleccionada = document.getElementById('eventName').value;
+        jugadorSeleccionado = document.getElementById('jugadorPrincipal').value;
+
+        // if (!jugadorSeleccionado || !accionSeleccionada) {
+        if (!accionSeleccionada) {
+            // alert("Por favor, selecciona un jugador y una acción.");
+            alert("Por favor, selecciona una acción.");
+            return;
+        }
+        // alert(event);
+
+        const coords = getRelativePosition(document.getElementById("campo"), event);
+        // let x1 = startPoint.x;
+        // let y1 = startPoint.y;
+        let x1 = Math.round(coords.x);
+        let y1 = Math.round(coords.y);
+        let x2 = '';
+        let y2 = '';
+        if((startPoint.x != endPoint.x) | (startPoint.y != endPoint.y)){
+            x2 = endPoint.x;
+            y2 = endPoint.y;
+        }
+
+        x_1 = x1 - 515;
+        y_1 = y1 - 200;
+
+        let por_x = '';
+        let por_y = '';
+        if((porteriaPoint.x != 0) & (porteriaPoint.y != 0)){
+            por_x = porteriaPoint.x;
+            por_y = porteriaPoint.y;
+        }
+        
+         // Si el clic fue hecho en un punto existente
+        // if (!event.target.classList.contains('punto')) {
+        // mostrarPunto(x1, y1);
+        // }
+        
+        mostrarPunto(coords.x, coords.y);
+        
+        // mostrarPuntoPorteria(por_x, por_y);
+
+        // Añadir el registro a la grilla
+        agregarRegistroAGrilla(x1, y1, x2, y2, por_x, por_y);
+        
+        // Resetear la acción y el jugador seleccionados después de registrar
+        accionSeleccionada = null;
+        jugadorSeleccionado = null;
+
+        //reset botonera
+        createButtonsFromLocalStorage();
+    }
+
+    function getRelativePosition(element, event) {
+        const rect = element.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        return { x, y };
+    }
+    // Modifica la función agregarRegistroAGrilla para añadir el tiempo:
+    function agregarRegistroAGrilla(x,y,x2,y2, porX,porY) {
+        
+        const tabla = document.getElementById('tablaRegistros');
+
+        const noDataRow = document.querySelector('#tablaRegistros tr.odd td.dataTables_empty');
+        if (noDataRow) {
+            noDataRow.parentElement.remove();
+        }
+
+        const evento = document.getElementById('eventName').value;
+        const periodo = document.getElementById("periodoSelector").value;
+        const jugador = document.getElementById("jugadorPrincipal").value;
+        const jugadorSecundary = document.getElementById("jugadorSecundario").value;
+        const equipo = document.getElementById("equipoJugadorPrincipal").value;
+        const timerValue = document.getElementById("timerDisplay").value;
+        const partes = timerValue.split(":");
+        const mins = parseInt(partes[0], 10);
+        const secs = parseInt(partes[1], 10);
+
+        let minStart = mins;
+        let segStart = secs;
+        let minEnd = 0;
+        let segEnd = (minStart*60) + 20;
+
+        // Obtenemos todos los inputs de acción
+        const inputsAcciones = document.querySelectorAll('#botonera input');
+
+        // console.log('start');
+        let eventID = obtenerSiguienteEventoId();
+        let linkYT = player.getVideoUrl();
+        // debugger;
+        // console.log(inputsAcciones);
+        let bandera = 'no';
+        inputsAcciones.forEach(input => {
+            if(input.value!=''){
+                // console.log('entro');
+                bandera = 'si';
+            }
+        });
+        if(bandera == 'si'){
+
+            inputsAcciones.forEach(input => {
+            
+                    // let evento = input.value;
+                    if(input.value!=''){
+                        const idgroup = input.value.split(" - ")[0]; // Asumiendo que el formato es "evento - característica"
+                        const idtext = input.value.split(" - ")[1];
+                        // console.log('entro');
+                        console.log(input.value);
+
+                        const fila = `
+                            <tr>
+                                <td><button onclick="openYouTubePopup('${linkYT}')" class="btn btn-info"><i class="fas fa-play"></i></button></td> 
+                                <td><button onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td> 
+                                <td>${eventID}</td>
+                                <td>${equipo}</td>
+                                <td>${jugador}</td>
+                                <td>${jugadorSecundary}</td>
+                                <td>${evento}</td>
+                                <td>${idgroup}</td>
+                                <td>${idtext}</td>
+                                <td>${periodo}</td>
+                                <td>${mins}</td>
+                                <td>${secs}</td>
+                                <td>${x}</td>
+                                <td>${y}</td>
+                                <td>${x2}</td>
+                                <td>${y2}</td>
+                                <td>${porX}</td>
+                                <td>${porY}</td>
+                            </tr>
+                        `;
+
+                        tabla.innerHTML += fila;
+                    }
+                    
+            });
+
+        }else{
+            const fila = `
+                    <tr>
+                        <td><button onclick="openYouTubePopup('${linkYT}')" class="btn btn-info"><i class="fas fa-play"></i></button></td> 
+                        <td><button onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td> 
+                        <td>${eventID}</td>
+                        <td>${equipo}</td>
+                        <td>${jugador}</td>
+                        <td>${jugadorSecundary}</td>
+                        <td>${evento}</td>
+                        <td></td>
+                        <td></td>
+                        <td>${periodo}</td>
+                        <td>${mins}</td>
+                        <td>${secs}</td>
+                        <td>${x}</td>
+                        <td>${y}</td>
+                        <td>${x2}</td>
+                        <td>${y2}</td>
+                        <td>${porX}</td>
+                        <td>${porY}</td>
+                    </tr>
+                `;
+
+                tabla.innerHTML += fila;
+        }
+    // console.log('end');
+
+    // Luego de agregar las filas, resetea todo como ya estabas haciendo:
+    resetBotonera();
+    document.getElementById("eventoSeleccionado").innerHTML = ''; // Limpia el botón del evento seleccionado
+    document.getElementById("inputEvento").value = ''; // Limpia el input del evento
+    // createButtonsFromLocalStorage()
+
+    document.getElementById("jugadorPrincipal").value='';
+    document.getElementById("jugadorSecundario").value='';
+    document.getElementById("porteria_X").value='';
+    document.getElementById("porteria_Y").value='';
+    document.getElementById("equipoJugadorPrincipal").value='';
+    document.getElementById("colorAccion").value='';
+    document.getElementById("eventName").value='';
+    isDragging = false;
+    startPoint = { x: 0, y: 0 };
+    endPoint = { x: 0, y: 0 };
+    porteriaPoint = { x: 0, y: 0 };
+    if (document.getElementById('autoSaveCheckbox').checked) {
+        guardarEstado('no');
+    }
+    // var tablaDiv = document.querySelector('#editableTable_wrapper .dataTables_scrollBody');
+    // tablaDiv.scrollTop = tablaDiv.scrollHeight;
+}
+
+    function obtenerSiguienteEventoId() {
+
+        let grilla = document.getElementById("tablaRegistros");
+        let ultimaFila = grilla.querySelector("tbody tr:last-child"); 
+        
+        if (ultimaFila) {
+            // Suponiendo que el ID del evento está en la segunda columna (ajusta el índice según sea necesario)
+            let celdaEventoId = ultimaFila.querySelector("td:nth-child(3)"); 
+           
+            if (celdaEventoId) {
+                let idActual = parseInt(celdaEventoId.textContent.trim(), 10);
+           
+                return idActual + 1;
+            }
+        }
+
+        // Si no hay filas o si algo sale mal, simplemente devuelve 1
+        return 1;
+    }
+
+    function openYouTubePopup(youtubeLink) {
+        const youtubeVideoID = youtubeLink.split('v=')[1].split('&')[0]; // Extrae el ID del video de YouTube del link
+        let tiempo = youtubeLink.split('watch?t=')[1].split('&')[0]; // Extrae el ID del video de YouTube del link
+
+        let resultado = parseInt(tiempo, 10) - 3;
+        tiempo = resultado.toString();
+
+        // console.log(tiempo); // Debería imprimir "7" (como string)
+
+        //https://www.youtube.com/watch?t=194&v=LNEADpPqmcc
+        const popupContent = `
+            <iframe width="560" height="315" 
+                src="https://www.youtube.com/embed/${youtubeVideoID}?autoplay=1&t=${tiempo}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        `;
+
+        const popup = window.open('', 'YouTubePopup', 'width=600,height=400,scrollbars=no');
+        popup.document.write(popupContent);
+        popup.document.close();
+    }
+
+</script>
+
+
+<!--CAMPO-->
+<script>
+
+    let puntos = [];
+
+    function mostrarPunto(x, y) {
+    
+    const punto = document.createElement('div');
+    
+    let color = 'gray';
+    if(document.getElementById("colorAccion").value){
+        color = document.getElementById("colorAccion").value;
+    } 
+
+    punto.style.width = '10px';  // Hacer el punto más grande
+    punto.style.height = '10px';
+    punto.style.background = color; // Color según la acción
+    punto.style.position = 'absolute';
+    punto.style.left = `${x - 5}px`;  // Ajustar para que el punto esté centrado con el clic
+    punto.style.top = `${y - 5}px`;
+    punto.style.borderRadius = '50%';
+
+    // Guarda el punto
+    puntos.push({x: x, y: y, accion: document.getElementById("eventName").value, nombreJugador: document.getElementById("jugadorPrincipal").value, color: color});
+
+    punto.setAttribute('title', `${document.getElementById("jugadorPrincipal").value} - Acción: ${document.getElementById("eventName").value}`);  // Tooltip con detalles
+
+    const campo = document.getElementById('campo');
+    campo.appendChild(punto);
+}
+
+
+    let isDragging = false;
+    let startPoint = { x: 0, y: 0 };
+    let endPoint = { x: 0, y: 0 };
+    let porteriaPoint = { x: 0, y: 0 };
+    
+    document.getElementById("campo").addEventListener("mousedown", function(event) {
+        isDragging = true;
+        startPoint.x = event.offsetX;
+        startPoint.y = event.offsetY;
+
+        // Muestra el punto final en el campo.
+        //mostrarPuntoEnd(startPoint.x, startPoint.y, 'white');  // Aquí estoy usando azul para el punto final, pero puedes cambiar el color según prefieras.
+
+    });
+    
+    document.getElementById("campo").addEventListener("mousemove", function(event) {
+        // if (isDragging) {
+        //     // Si quieres hacer algo visual mientras arrastras, aquí es el lugar.
+        // }
+        isDragging = true;
+    });
+    
+    const dibujos = {
+        puntos: [],
+        lineas: []
+        };
+
+    function guardarDibujo() {
+        localStorage.setItem('dibujos', JSON.stringify(dibujos));
+    }
+
+    document.getElementById("campo").addEventListener("mouseup", function(event) {
+        if (isDragging) {
+            endPoint.x = event.offsetX;
+            endPoint.y = event.offsetY;
+    
+        // Dibuja la línea desde el punto de inicio al punto de fin
+        dibujarLinea(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+        dibujos.lineas.push({
+            x1: startPoint.x,
+            y1: startPoint.y,
+            x2: endPoint.x,
+            y2: endPoint.y
+            });
+        guardarDibujo();
+
+            
+        // Muestra el punto final en el campo.
+        //mostrarPuntoEnd(endPoint.x, endPoint.y, 'blue');  // Aquí estoy usando azul para el punto final, pero puedes cambiar el color según prefieras.
+
+            // Aquí puedes procesar la información de arrastrar y soltar.
+            // Por ahora, simplemente voy a imprimir las coordenadas en la consola.
+            // console.log(`Started at (${startPoint.x}, ${startPoint.y}) and ended at (${endPoint.x}, ${endPoint.y})`);
+    
+            isDragging = false;
+        }
+    });
+
+    function cargarDibujo() {
+    const data = localStorage.getItem('dibujos');
+    if (data) {
+        const dibujosGuardados = JSON.parse(data);
+        dibujosGuardados.puntos.forEach(punto => {
+        mostrarPunto(punto.x, punto.y, punto.color);
+        });
+        dibujosGuardados.lineas.forEach(linea => {
+        dibujarLinea(linea.x1, linea.y1, linea.x2, linea.y2);
+        });
+    }
+    }
+ 
+    function mostrarPuntoEnd(x, y, color='gray') {
+        const punto = document.createElement('div');
+        punto.style.width = '10px';
+        punto.style.height = '10px';
+        punto.style.background = color;
+        punto.style.position = 'absolute';
+        punto.style.left = `${x - 5}px`;
+        punto.style.top = `${y - 5}px`;
+        punto.style.borderRadius = '50%';
+
+        // Si quieres agregar tooltips o más detalles al punto, hazlo aquí.
+
+        const campo = document.getElementById('campo');
+        campo.appendChild(punto);
+    }
+
+    function dibujarLinea(x1, y1, x2, y2, color = 'red') {
+        const campo = document.getElementById('campo');
+        const linea = document.createElement('div');
+        const longitud = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        const angulo = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        const transform = `rotate(${angulo}deg)`;
+
+        linea.style.background = color;
+        linea.style.width = `${longitud}px`;
+        linea.style.height = '2px';  // Grosor de la línea
+        linea.style.position = 'absolute';
+        linea.style.top = `${y1}px`;
+        linea.style.left = `${x1}px`;
+        linea.style.transform = transform;
+        linea.style.transformOrigin = '0% 0%';
+        linea.style.zIndex = 0;  // Asegúrate de que la línea esté debajo de los puntos
+        
+        campo.appendChild(linea);
+    }
+
+    
+</script>
+
+<!--PORTERIA-->
+<script>
+
+    let puntosPorteria = [];
+
+    function mostrarPuntoPorteria(x, y) {
+        const punto = document.createElement('div');
+
+        let color = 'gray';
+        if(document.getElementById("colorAccion").value){
+            color = document.getElementById("colorAccion").value;
+        } 
+
+        punto.style.width = '10px';  // Hacer el punto más grande
+        punto.style.height = '10px';
+        punto.style.background = color; // Color según la acción
+        punto.style.position = 'absolute';
+        punto.style.left = `${x}px`;  // Ajustar para que el punto esté centrado con el clic
+        punto.style.top = `${y}px`;
+        punto.style.borderRadius = '50%';
+
+        // Guarda el punto
+        puntosPorteria.push({x: x, y: y, accion: document.getElementById("eventName").value, nombreJugador: document.getElementById("jugadorPrincipal").value, color: color});
+
+        punto.setAttribute('title', `${document.getElementById("jugadorPrincipal").value} - Acción: ${document.getElementById("eventName").value}`);  // Tooltip con detalles
+
+        const porteria = document.getElementById('porteria');
+        porteria.appendChild(punto);
+    }
+
+
+    function registrarAccionPorteria(event) {
+        const porterias = document.getElementById("porterias");
+        const porteriasRect = porterias.getBoundingClientRect();
+        let posX = Math.round(event.clientX - porteriasRect.left) - 25;
+        let posY = Math.round(event.clientY - porteriasRect.top) - 5;
+
+        const porteriasWidth = porteriasRect.width;
+        const porteriasHeight = porteriasRect.height;
+
+        //porteria X de 58 a 362 Y de 58 a 199
+        if (posX > 58 && posX < 362 && posY > 58 && posY < 199) {
+            // console.log("Disparo dentro de la portería");
+            // Añadir lógica para marcar dentro de la portería
+        } else {
+            // console.log("Disparo fuera de la portería");
+            // Añadir lógica para marcar fuera de la portería
+        }
+
+        porteriaPoint.x = posX;
+        porteriaPoint.y = posY;
+
+        mostrarPuntoPorteria(posX, posY);
+
+        document.getElementById('porteria_X').value = posX;
+        document.getElementById('porteria_Y').value = posY;
+
+        // alert(posX);
+        // alert(posY);
+        // document.getElementById('porteriaX').innerText = "X: " + posX;
+        // document.getElementById('porteriaY').innerText = "Y: " + posY;
+    }
+
+
+</script>
+
+<!--EDITAR TIEMPO-->
+<script>
+
+
+let timerInterval = null;
+    let elapsedTime = 0; // Tiempo transcurrido en segundos
+
+    function startTimer() {
+
+        
+
+        let timerInput = document.getElementById("timerDisplay");
+        if (!timerInterval) {
+            timerInterval = setInterval(function() {
+                let timeParts = timerInput.value.split(':');
+                let mins = +timeParts[0];
+                let secs = +timeParts[1];
+
+                secs++;
+                if (secs >= 60) {
+                    mins++;
+                    secs = 0;
+                }
+
+                timerInput.value = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }, 1000);
+        }
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    function resetTimer() {
+        stopTimer();
+        let timerInput = document.getElementById("timerDisplay");
+        timerInput.value = "00:00";
+    }
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function editarTiempo() {
+        let timerInput = document.getElementById("timerDisplay");
+
+        // Habilitar la edición
+        timerInput.removeAttribute("readonly");
+
+        // Listener para cuando el usuario presiona "Enter"
+        timerInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                // Deshabilitar la edición
+                timerInput.setAttribute("readonly", true);
+            }
+        });
+
+        // Listener para cuando el usuario hace clic fuera del input
+        timerInput.addEventListener("blur", function() {
+            timerInput.setAttribute("readonly", true);
+        });
+
+        timerInput.focus();
+    }
+
+    function isTimerRunning() {
+        return timerInterval !== null;
+    }
+
+</script>
+
+<!--EDITAR BOTONES-->
+<script>
+    function makeButtonEditable(buttonElement) {
+        // Crear un elemento de entrada
+        let inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.value = buttonElement.innerText;
+
+        // Reemplazar el botón con la entrada
+        buttonElement.parentNode.replaceChild(inputElement, buttonElement);
+
+        // Enfocar automáticamente en la entrada y seleccionar el texto
+        inputElement.focus();
+        inputElement.select();
+
+        // Agregar detectores de eventos
+        inputElement.addEventListener("blur", function() {
+            revertToButton(inputElement, buttonElement);
+        });
+
+        inputElement.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                revertToButton(inputElement, buttonElement);
+            }
+        });
+    }
+
+    function revertToButton(inputElement, originalButton) {
+        // Actualizar el texto del botón
+        originalButton.innerText = inputElement.value;
+
+        // Reemplazar la entrada con el botón
+        inputElement.parentNode.replaceChild(originalButton, inputElement);
+    }
+
+    // Adjuntar el comportamiento editable a todos los botones
+    document.addEventListener("DOMContentLoaded", function() {
+        let allButtons = document.querySelectorAll("button.btn");
+        allButtons.forEach(function(button) {
+            button.addEventListener("dblclick", function(event) {
+                event.preventDefault();  // Prevenir la acción de clic original
+                makeButtonEditable(button);
+            });
+        });
+    });
+</script>
+
+<!--EDITAR TABLE-->
+<script>
+
+    function eliminarFila(button) {
+        const fila = button.parentElement.parentElement; // Navega hasta el elemento <tr>
+        fila.remove();
+    }
+
+
+    // Opcional: una función para obtener todos los registros marcados para edición:
+    function obtenerRegistrosParaEditar() {
+        const tabla = document.getElementById('tablaRegistros');
+        const filas = tabla.querySelectorAll('tr');
+
+        const registrosParaEditar = [];
+
+        for (const fila of filas) {
+            const checkbox = fila.querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {
+                registrosParaEditar.push(fila);
+            }
+        }
+
+        // Ahora tienes todos los registros (filas) marcados para edición en registrosParaEditar
+        // Puedes procesarlos como lo necesites aquí
+    }
+
+    function makeCellEditable(tdElement) {
+        // Crear un elemento de entrada
+        let inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.value = tdElement.innerText;
+
+        // Reemplazar el contenido de la celda con la entrada
+        tdElement.innerHTML = "";
+        tdElement.appendChild(inputElement);
+
+        // Enfocar automáticamente en la entrada y seleccionar el texto
+        inputElement.focus();
+        inputElement.select();
+
+        // Agregar detectores de eventos
+        inputElement.addEventListener("blur", function() {
+            revertToCell(inputElement, tdElement);
+        });
+
+        inputElement.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                revertToCell(inputElement, tdElement);
+            }
+        });
+    }
+
+    function revertToCell(inputElement, tdElement) {
+        // Actualizar el contenido de la celda
+        tdElement.innerText = inputElement.value;
+    }
+
+    // Adjuntar el comportamiento editable a las celdas de la tabla usando delegación de eventos
+    document.addEventListener("DOMContentLoaded", function() {
+        let tableBody = document.querySelector("#tablaRegistros");
+        tableBody.addEventListener("dblclick", function(event) {
+            // Verificar si el elemento clickeado es una celda y no está en las primeras dos columnas (Edit & Delete)
+            if (event.target.tagName === "TD" && event.target.cellIndex > 1) {
+                makeCellEditable(event.target);
+            }
+        });
+    });
+
+    $(document).ready( function () {
+    $('#editableTable').DataTable({
+        "scrollY": "150px", // Altura máxima del cuerpo de la tabla antes de mostrar el scroll
+        "scrollCollapse": true,
+        "paging": false, // Deshabilita la paginación
+        "info": false, // Deshabilita la información de registros mostrados
+        "searching": false // Deshabilita el filtro de búsqueda
+    });
+    // Ajustar el scroll para mostrar el último registro
+    var tablaDiv = document.querySelector('#editableTable_wrapper .dataTables_scrollBody');
+    tablaDiv.scrollTop = tablaDiv.scrollHeight;
+
+    let estadoGuardado = localStorage.getItem('partidoEstado');
+    if (estadoGuardado) {
+        let estadoPartido = JSON.parse(estadoGuardado);
+        
+        if (estadoPartido.codigoSesion) {
+            document.getElementById("codigoSesion").value = estadoPartido.codigoSesion;
+        }else{
+            GetSesionID();
+        }
+        
+    }
+
+    
+    
+} );
+</script>
+
+<!--LINK-->
+<script>
+    
+    var player;
+    let popup = null; // Esta variable estará disponible en todo el script.
+
+    function loadYouTubeVideo(minStart,segStart,minEnd,segEnd) {
+        // debugger;
+            let link = document.getElementById("youtubeLink").value;
+            let videoID = link.split("v=")[1];
+            let ampersandPosition = videoID.indexOf('&');
+            if(ampersandPosition != -1) {
+                videoID = videoID.substring(0, ampersandPosition);
+            }
+
+            let embedURL = "https://www.youtube.com/embed/" + videoID;
+            timeStart = (minStart * 60) + segStart;
+            if(timeStart>=0){
+                embedURL = embedURL + '?start='+timeStart.toString();
+            }
+            timeEnd = (minEnd * 60) + segEnd;
+            if(timeEnd>0){
+                embedURL = embedURL + '&end='+timeEnd.toString();
+            }
+            embedURL = embedURL + '&autoplay=1';
+            
+            // onYouTubeIframeAPIReady(videoID);
+            // player.loadVideoById(videoID);
+            player.loadVideoById({'videoId': videoID,
+                'startSeconds': segEnd,
+                'endSeconds': timeEnd,
+                playerVars: { 
+                    'autoplay': 1, 
+                    'controls': 0,
+                    'autohide': 1,
+                    'showinfo': 0,
+                    'wmode': 'opaque'},
+                'suggestedQuality': 'large'
+                });
+
+            // alert(embedURL);
+            
+            // document.getElementById("youtubePlayer").src = embedURL;
+            // onYouTubeIframeAPIReady()
+            // debugger;
+            let element = document.getElementById("youtubePlayer");
+            let hidden = element.getAttribute("hidden");
+            
+            if (hidden) {
+                // element.removeAttribute("hidden");
+                // button.innerText = "Hide Iframe";
+            } else {
+                element.setAttribute("hidden", "hidden");
+                // button.innerText = "Show Iframe";
+            }
+
+            var x = document.getElementById("player");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+
+        }
+
+    
+
+    function duplicarPantalla() {
+        let link = document.getElementById("youtubeLink").value;
+            let videoID = link.split("v=")[1];
+            let ampersandPosition = videoID.indexOf('&');
+            if(ampersandPosition != -1) {
+                videoID = videoID.substring(0, ampersandPosition);
+            }
+
+            // let embedURL = "https://www.youtube.com/embed/" + videoID;
+            // timeStart = (minStart * 60) + segStart;
+            // if(timeStart>=0){
+            //     embedURL = embedURL + '?start='+timeStart.toString();
+            // }
+            // timeEnd = (minEnd * 60) + segEnd;
+            // if(timeEnd>0){
+            //     embedURL = embedURL + '&end='+timeEnd.toString();
+            // }
+            // embedURL = embedURL + '&autoplay=1';
+
+        // let videoId = obtenerIdDelVideo(); // Suponiendo que tienes una función que obtiene el ID del video.
+        popup = window.open('popupPlayer.html?videoId=' + videoID, 'popupWindow', 'width=600,height=400,scrollbars=yes');
+
+        // Espera a que la ventana emergente esté lista (puede ser necesario ajustar el tiempo de espera)
+        setTimeout(() => {
+            if (player && popup && !popup.closed) {
+                let currentTime = player.getCurrentTime();
+                popup.updateVideoTime(currentTime);
+            }
+        }, 2000);
+    }
+
+    function sendCommandToVideoWindow(command) {
+        if (newWindow && !newWindow.closed) {
+            newWindow.postMessage(command, '*');
+        }
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.data === 'play') {
+            // Llama a la función para reproducir el video.
+            player.playVideo();
+        } else if (event.data === 'pause') {
+            // Llama a la función para pausar el video.
+            player.pauseVideo();
+        }
+        // ... otros comandos que necesites.
+    });
+
+    function onPlayerReady(event) {
+        // debugger;
+        // El reproductor está listo.
+        // Aquí puedes llamar a las funciones del reproductor.
+        // console.log(player.getPlayerState());
+        // Por ejemplo, si deseas reproducir el video automáticamente cuando esté listo, puedes hacer:
+        event.target.playVideo();
+        // alert('4');
+        // Si deseas mostrar un mensaje en la consola indicando que el reproductor está listo, puedes hacer:
+        // console.log("El reproductor de YouTube está listo.");
+
+        // Si tienes otros ajustes iniciales o acciones que quieras realizar cuando el reproductor esté listo, puedes agregarlos aquí.
+    }
+
+    document.addEventListener('keyup', function(event) {
+        // debugger;
+        // console.log(player.getPlayerState());
+        // alert('1');
+        if (event.code === 'Space') {
+            // if(player.getPlayerState()==1){
+            //     player.pauseVideo();
+            // }else{
+            //     player.playVideo();
+            // }
+            
+            event.preventDefault();
+            // alert('3');
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        // debugger;
+        // console.log(player.getPlayerState());
+        const activeElement = document.activeElement;
+
+        if (activeElement && activeElement.id === "descripcion" && event.code === 'Space') {
+            // Si el foco está en el input "descripcion", permite que se inserte el espacio y no hagas nada más.
+            return;
+        }
+
+        // Si el foco está en un botón con data-equipo="home" o data-equipo="away", simplemente retornamos.
+        if ((document.activeElement.getAttribute('data-equipo') === 'home' || document.activeElement.getAttribute('data-equipo') === 'away') && event.code === 'Space') {
+            // alert('entro');
+            return;
+        }
+        // alert(ocument.activeElement.getAttribute('data-equipo'));
+        if (event.code === 'Space') {
+            if(player.getPlayerState()==1){
+                player.pauseVideo();
+                stopTimer();
+                // Para pausar el video
+                // Verificar si la ventana emergente está abierta y pausar el video en ella.
+                if (popup && !popup.closed) {
+                    popup.pauseVideo();
+                }
+            }else{
+                if(player.getPlayerState()==-1){
+                    if (isTimerRunning()) {
+                        // console.log("El temporizador está en ejecución");
+                        stopTimer();
+                    } else {
+                        // console.log("El temporizador está detenido");
+                        startTimer();
+                    }
+                }else{
+                    player.playVideo();
+                    startTimer();
+
+                    // Para reproducir el video
+                    // Verificar si la ventana emergente está abierta y pausar el video en ella.
+                    if (popup && !popup.closed) {
+                        popup.playVideo();
+                    }
+                }
+            }
+            
+            event.preventDefault();
+            // alert('3');
+        }
+        
+    });
+
+    function onPlayerStateChange(event) {
+        // alert('3');
+        // Aquí puedes manejar los cambios de estado si es necesario
+        // alert('1');
+        // debugger;
+        console.log(player.getPlayerState());
+    }
+
+
+</script>
+<script>
+
+    function onYouTubeIframeAPIReady(ID_VIDEO) {
+
+        
+        // debugger;
+      player = new YT.Player('player', {
+        height: '320',
+        width: '512',
+        videoId: ID_VIDEO,
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+    function onPlayerStateChange(event) {
+      if (event.data == YT.PlayerState.PLAYING && !done) {
+        // setTimeout(stopVideo, 6000);
+        done = true;
+      }
+    }
+    function stopVideo() {
+      player.stopVideo();
+    }
+  </script>
+
+<!--EDITAR EQUIPO-->
+<script>
+function editarNombreEquipo(elemento) {
+    let nombreActual = elemento.innerText;
+    
+    // Crear un input para editar
+    let input = document.createElement('input');
+    input.value = nombreActual;
+    input.onblur = function() {
+        finalizarEdicion(elemento, input);
+    };
+    input.onkeydown = function(event) {
+        if (event.key === "Enter") {
+            finalizarEdicion(elemento, input);
+        }
+    };
+    
+    // Reemplazar el texto con el input
+    elemento.replaceWith(input);
+    input.focus();
+}
+
+function finalizarEdicion(elemento, input) {
+    if (input.value.trim() !== "") {
+        elemento.innerText = input.value.trim();
+        input.replaceWith(elemento);
+    } else {
+        input.replaceWith(elemento);
+    }
+}
+
+</script>
+
+<!--GUARDAR ESTADO-->
+<script>
+   function guardarEstado(mensajeOk) {
+    // Recoger información
+    let matchID = document.getElementById("matchID").value;
+    let codigoSesion = document.getElementById("codigoSesion").value;
+    let fecha = document.getElementById("fecha").value;
+    let descripcion = document.getElementById("descripcion").value;
+
+    // Recoger información
+    let periodoSelector = document.getElementById("periodoSelector").value;
+
+    // Recoger información
+    let timerDisplay = document.getElementById("timerDisplay").value;
+
+    // Recoger los nombres de los equipos
+    let nombreEquipo1 = document.getElementById("nombreEquipo1").innerText;
+    let nombreEquipo2 = document.getElementById("nombreEquipo2").innerText;
+
+    // Recoger información
+    let linkVideo = document.getElementById("youtubeLink").value;
+
+    let registros = [];
+    
+    // Iterar sobre las filas de la tabla y guardar la información
+    let filas = document.querySelectorAll("#tablaRegistros tr");
+    filas.forEach(function(fila) {
+        let columnas = fila.querySelectorAll("td");
+        let linkYT = '';
+       
+        if (columnas.length > 0 && columnas[0] && columnas[0].classList.value != "dataTables_empty") {
+            linkYT = extraerURLFromOnclick(columnas[0]);
+        } 
+        
+        let registro = {
+            linkYT: linkYT ? linkYT : '',
+            eventID: columnas[2] ? columnas[2].innerText : '',
+            team: columnas[3] ? columnas[3].innerText : '',
+            player: columnas[4] ? columnas[4].innerText : '',
+            playerSecundary: columnas[5] ? columnas[5].innerText : '',
+            idcode: columnas[6] ? columnas[6].innerText : '',
+            idgroup: columnas[7] ? columnas[7].innerText : '',
+            idtext: columnas[8] ? columnas[8].innerText : '',
+            periodo: columnas[9] ? columnas[9].innerText : '',
+            mins: columnas[10] ? columnas[10].innerText : '',
+            secs: columnas[11] ? columnas[11].innerText : '',
+            x: columnas[12] ? columnas[12].innerText : '',
+            y: columnas[13] ? columnas[13].innerText : '',
+            x2: columnas[14] ? columnas[14].innerText : '',
+            y2: columnas[15] ? columnas[15].innerText : '',
+            porX: columnas[16] ? columnas[16].innerText : '',
+            porY: columnas[17] ? columnas[17].innerText : ''
+        };
+        registros.push(registro);
+    });
+
+    // Recoger los nombres de los jugadores y las acciones
+    let jugadoresEquipo1 = [];
+    let jugadoresEquipo2 = [];
+    let botonesJugadores1 = document.querySelectorAll(".col-6 .list-group-item button[data-team='Equipo 1']");
+    let botonesJugadores2 = document.querySelectorAll(".col-6 .list-group-item button[data-team='Equipo 2']");
+    botonesJugadores1.forEach(btn => jugadoresEquipo1.push(btn.innerText));
+    botonesJugadores2.forEach(btn => jugadoresEquipo2.push(btn.innerText));
+
+    let acciones = [];
+    let botonesAcciones = document.querySelectorAll("#acciones button");
+    botonesAcciones.forEach(btn => acciones.push(btn.innerText));
+
+    // Guardar la información en Local Storage
+    let estadoPartido = {
+        matchID: matchID,
+        codigoSesion: codigoSesion,
+        fecha: fecha,
+        descripcion: descripcion,
+        periodoSelector: periodoSelector,
+        timerDisplay: timerDisplay,
+        linkVideo: linkVideo,
+        nombreEquipo1: nombreEquipo1,
+        nombreEquipo2: nombreEquipo2,
+        registros: registros,
+        puntos: puntos,
+        puntosPorteria: puntosPorteria,
+        jugadoresEquipo1: jugadoresEquipo1,
+        jugadoresEquipo2: jugadoresEquipo2,
+        acciones: acciones
+    };
+
+    localStorage.setItem('partidoEstado', JSON.stringify(estadoPartido));
+
+    if (mensajeOk=='si') {
+        alert("Estado del partido guardado exitosamente!");
+    }
+    
+}
+
+function extraerURLFromOnclick(tdElement) {
+    // Obtiene el valor del atributo 'onclick' del botón dentro del <td>
+    let onclickValue = tdElement.querySelector("button").getAttribute("onclick");
+    // Usa una expresión regular para extraer la URL
+    let match = onclickValue.match(/openYouTubePopup\('([^']+)'\)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    
+    return null; // Devuelve null si no se encuentra la URL
+}
+
+</script>
+
+<!--CARGAR ESTADO-->
+<script>
+    function cargarEstado() {
+        // Comprobar si hay datos guardados en el Local Storage
+        let estadoGuardado = localStorage.getItem('partidoEstado');
+        
+        if (estadoGuardado) {
+            let estadoPartido = JSON.parse(estadoGuardado);
+            
+            // Rellenar el campo del id del partido 
+            document.getElementById("matchID").value = estadoPartido.matchID;
+            document.getElementById("codigoSesion").value = estadoPartido.codigoSesion;
+            document.getElementById("fecha").value = estadoPartido.fecha;
+            document.getElementById("descripcion").value = estadoPartido.descripcion;
+
+            // Rellenar el campo del periodoSelector
+            document.getElementById("periodoSelector").value = estadoPartido.periodoSelector;
+            
+
+            if (estadoPartido.timerDisplay) {
+                document.getElementById("timerDisplay").value = estadoPartido.timerDisplay;
+            }
+
+            // Rellenar el campo de enlace de YouTube
+            document.getElementById("youtubeLink").value = estadoPartido.linkVideo;
+
+            // Rellenar los nombres de los equipos
+            if (estadoPartido.nombreEquipo1) {
+                document.getElementById("nombreEquipo1").innerText = estadoPartido.nombreEquipo1;
+            }
+            if (estadoPartido.nombreEquipo2) {
+                document.getElementById("nombreEquipo2").innerText = estadoPartido.nombreEquipo2;
+            }
+
+            // Rellenar la tabla con los registros
+            let tablaRegistros = document.getElementById("tablaRegistros");
+            tablaRegistros.innerHTML = ""; // Limpiar la tabla primero
+            
+            estadoPartido.registros.forEach(function(registro) {
+                let fila = document.createElement("tr");
+
+                let minStart = registro.mins;
+                let segStart = registro.secs;
+                let minEnd = 0;
+                let segEnd = (minStart*60) + 20;
+                fila.innerHTML = `
+                    <td><button onclick="openYouTubePopup('${registro.linkYT}')" class="btn btn-info"><i class="fas fa-play"></i></button></td> <!-- Checkbox para edición -->
+                    <td><button onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td> <!-- Botón eliminar con el onclick definido -->
+
+                    <td>${registro.eventID}</td>
+                    <td>${registro.team}</td>
+                    <td>${registro.player}</td>
+                    <td>${registro.playerSecundary}</td>
+                    <td>${registro.idcode}</td>
+                    <td>${registro.idgroup}</td>
+                    <td>${registro.idtext}</td>
+                    <td>${registro.periodo}</td>
+                    <td>${registro.mins}</td>
+                    <td>${registro.secs}</td>
+                    <td>${registro.x}</td>
+                    <td>${registro.y}</td>
+                    <td>${registro.x2}</td>
+                    <td>${registro.y2}</td>
+                    <td>${registro.porX}</td>
+                    <td>${registro.porY}</td>
+                `;
+                tablaRegistros.appendChild(fila);
+            });
+
+            // Dibujar puntos en el campo
+            if (estadoPartido.puntos) {
+
+                puntos = estadoPartido.puntos;
+                // Guarda el punto
+                // puntos.push({x: x, y: y, accion: accionSeleccionada, nombreJugador: jugadorSeleccionado.nombreJugador});
+
+                // punto.setAttribute('title', `${jugadorSeleccionado.nombreJugador} - Acción: ${accionSeleccionada}`);  // Tooltip con detalles
+
+
+                estadoPartido.puntos.forEach(punto => {
+                    // alert(punto.accion);
+                    let divPunto = document.createElement('div');
+                    divPunto.style.position = 'absolute';
+                    divPunto.style.left = (punto.x - 5) + 'px'; 
+                    divPunto.style.top = (punto.y - 5) + 'px';
+                    divPunto.style.width = '10px';
+                    divPunto.style.height = '10px';
+                    divPunto.style.backgroundColor = punto.color; // Usa la función para obtener el color
+                    divPunto.style.borderRadius = '50%';
+
+                    document.getElementById('campo').appendChild(divPunto);
+                });
+            }
+
+            // Dibujar puntos en el campo
+            if (estadoPartido.puntosPorteria) {
+
+                puntosPorteria = estadoPartido.puntosPorteria;
+                // Guarda el punto
+                // puntos.push({x: x, y: y, accion: accionSeleccionada, nombreJugador: jugadorSeleccionado.nombreJugador});
+
+                // punto.setAttribute('title', `${jugadorSeleccionado.nombreJugador} - Acción: ${accionSeleccionada}`);  // Tooltip con detalles
+
+
+                estadoPartido.puntosPorteria.forEach(punto => {
+                    
+                    let divPunto  = document.createElement("div");
+                    divPunto.style.width = "10px";
+                    divPunto.style.height = "10px";
+                    divPunto.style.background = "grey";
+                    divPunto.style.borderRadius = "50%";
+                    divPunto.style.position = "absolute";
+                    divPunto.style.top = punto.y + "px";
+                    divPunto.style.left = punto.x + "px";
+                    divPunto.style.backgroundColor = 'gray';
+                    divPunto.style.transform = "translate(-50%, -50%)";  
+
+                    document.getElementById('porteria').appendChild(divPunto);
+                });
+            }
+
+            // Rellenar los nombres de los jugadores y acciones
+            let botonesJugadores1 = document.querySelectorAll(".col-6 .list-group-item button[data-team='Equipo 1']");
+            let botonesJugadores2 = document.querySelectorAll(".col-6 .list-group-item button[data-team='Equipo 2']");
+            estadoPartido.jugadoresEquipo1.forEach((nombre, index) => {
+                if (botonesJugadores1[index]) botonesJugadores1[index].innerText = nombre;
+            });
+            estadoPartido.jugadoresEquipo2.forEach((nombre, index) => {
+                if (botonesJugadores2[index]) botonesJugadores2[index].innerText = nombre;
+            });
+
+            let botonesAcciones = document.querySelectorAll("#acciones button");
+            estadoPartido.acciones.forEach((accion, index) => {
+                if (botonesAcciones[index]) botonesAcciones[index].innerText = accion;
+            });
+
+            cargarDibujo();
+        }
+    }
+
+    // Cargar el estado al cargar la página
+    document.addEventListener("DOMContentLoaded", cargarEstado);
+</script>
+
+<!--BORRAR MEMORIA DESCARGAR A CSV Y AUTO SAVE-->
+<script>
+
+    function blanquear() {
+        let respuesta = confirm("¿Estás seguro de que quieres blanquear (limpiar) todos los datos?");
+
+        if (respuesta) {
+            localStorage.clear();
+            // Refrescar la página
+            location.reload();
+        } else {
+            // El usuario canceló la acción
+            console.log("Blanqueo cancelado.");
+        }
+    }
+
+    function descargarCSV() {
+
+            const fecha = document.getElementById("fecha").value; // Asegúrate de tener un input con id "fecha"
+            const descripcion = document.getElementById("descripcion").value; // Asegúrate de tener un input con id "descripcion"
+            const matchID = document.getElementById("matchID").value;
+            const youtubeLink = document.getElementById("youtubeLink").value;
+
+
+            const tabla = document.getElementById('tablaRegistros');
+            const rows = tabla.querySelectorAll('tr');
+
+            let csvContent = "";
+
+            //tendria que agregar el id del partido, el link del partido, la descripcion, la fecha, el link del evento
+            csvContent += '"Id Partido","Link Partido","Descripción","Fecha","Link Evento","eventID","Team","Player","Secundary","code","group","text","Periodo","Mins","Secs","startX","startY","endX","endY","porX","porY"';
+
+            csvContent += '\n';
+
+            for (let i = 0; i < rows.length; i++) {
+                
+                const cells = rows[i].querySelectorAll('td, th');
+
+                let linkYT = extraerURLFromOnclick(cells[0]);
+
+                csvContent += '"'+matchID+' "';
+                csvContent += ',';
+                csvContent += '"'+youtubeLink+'"';
+                csvContent += ',';
+                csvContent += '"'+descripcion+'"';
+                csvContent += ',';
+                csvContent += '"'+fecha+'"';
+                csvContent += ',';
+                csvContent += '"'+linkYT+'"';
+                
+                for (let j = 2; j < cells.length; j++) {
+                    //si es cero metemos el link
+                    if (j) csvContent += ',';
+                    csvContent += '"' + cells[j].innerText + '"';
+                }
+                
+                csvContent += '\n';
+            }
+
+            // Crear y descargar el archivo CSV
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const a = document.createElement('a');
+            
+            a.href = URL.createObjectURL(blob);
+            a.download = 'datos.csv';
+            a.click();
+
+            URL.revokeObjectURL(a.href);
+        }
+
+    document.getElementById('autoSaveCheckbox').addEventListener('change', function() {
+        // alert(this.checked);
+    localStorage.setItem('autoSave', this.checked);
+});
+
+</script>
+
+<script>
+    const numBotones = 3;
+    const numNiveles = 3;
+    
+    let selecciones = {};
+    
+    function resetAll_btn() {
+        let allButtons = document.querySelectorAll("#botonera .btn");
+        allButtons.forEach(btn => btn.classList.add("d-none"));
+    }
+
+    function resetAll() {
+        let selects = document.querySelectorAll("select");
+        selects.forEach(function(select) {
+            if(select.id != 'periodoSelector'){
+                elect.classList.add("d-none");
+                select.value = "1";  // Restablecer al valor predeterminado
+            }
+            
+        });
+    
+        let botones = document.querySelectorAll("#botonera button");
+        botones.forEach(function(boton) {
+            boton.classList.remove("d-none");
+        });
+    
+        selecciones = {};  // Resetear el objeto de selecciones
+        actualizarInputGlobal();
+    }
+    
+    function actualizarInputGlobal() {
+        inputGlobal.value = JSON.stringify(selecciones);
+        accionSeleccionada = inputGlobal.value;
+    }
+    
+    function handleFile() {
+        resetBotonera();
+        const input = document.getElementById('upload');
+        const file = input.files[0];
+    
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const data = event.target.result;
+            const workbook = XLSX.read(data, {
+                type: 'binary'
+            });
+    
+            processWorkbook(workbook);
+        };
+    
+        reader.readAsBinaryString(file);
+
+        if (document.getElementById('autoSaveCheckbox').checked) {
+            guardarEstado('no');
+        }
+    }
+    
+    function processWorkbook(workbook) {
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+        // Guardar datos en el localStorage
+        localStorage.setItem('botonesData', JSON.stringify(data));
+    
+        // Llama a la función para crear los botones y selectores
+        createButtonsFromLocalStorage();
+    }
+    
+    function actualizarInputGlobal() {
+        document.getElementById("inputGlobal").value = JSON.stringify(selecciones);
+    }
+  
+    function createDynamicButton(dataRow) {
+        let col = document.createElement("div");
+        col.className = "col-md-3 mb-3";
+
+        // Crear botón principal
+        let boton = createButton(dataRow[0], dataRow[1]);
+
+        boton.addEventListener("click", function() {
+            resetBotonera(); // Oculta todos los botones
+            
+            document.getElementById("inputEvento").value = dataRow[0]; // Guarda el evento seleccionado en el input
+
+            // Mover el botón del evento a la sección específica
+            const eventoSeleccionado = document.getElementById("eventoSeleccionado");
+            eventoSeleccionado.innerHTML = ''; // Limpia cualquier botón anterior
+            eventoSeleccionado.appendChild(boton);
+
+            for (let i = 2; i < dataRow.length; i++) {
+                const optionsString = dataRow[i];
+                const options = optionsString.split(',').map(option => option.trim());
+                
+                let newCol = document.createElement("div");
+                newCol.className = "col-md-3 mb-3";
+                
+                // Crear y agregar un input en la parte superior para mostrar la acción seleccionada
+                let inputAccion = document.createElement("input");
+                inputAccion.type = "text";
+                inputAccion.id = `inputAccionNivel${i-1}`;
+                inputAccion.className = "form-control mb-2";
+                inputAccion.readOnly = true;
+                inputAccion.placeholder = `Nivel ${i-1} seleccionado`;
+                newCol.appendChild(inputAccion);
+                
+                options.forEach(optionText => {
+                    let subButton = createButton(optionText);
+                    subButton.addEventListener("click", function() {
+                        // Asigna el valor del botón al input correspondiente
+                        inputAccion.value = optionText;
+                    });
+                    newCol.appendChild(subButton);
+                });
+
+                document.getElementById("colorAccion").value = boton.style.backgroundColor;
+                document.getElementById("eventName").value = boton.innerText;
+
+                document.getElementById("botonera").appendChild(newCol);
+            }
+        });
+
+        col.appendChild(boton);
+        document.getElementById("botonera").appendChild(col);
+    }
+
+    document.getElementById("btnReset").addEventListener("click", function() {
+
+        
+
+        resetBotonera();
+        document.getElementById("eventoSeleccionado").innerHTML = ''; // Limpia el botón del evento seleccionado
+        document.getElementById("inputEvento").value = ''; // Limpia el input del evento
+        createButtonsFromLocalStorage()
+    });
+
+    function resetBotonera() {
+        let botonera = document.getElementById("botonera");
+        while (botonera.firstChild) {
+            botonera.removeChild(botonera.firstChild);
+        }
+    }
+
+    function createButton(text, bgColor = "#6c757d") {
+        let button = document.createElement("button");
+        button.innerText = text;
+        button.id = text.replace(/ /g, '').toLowerCase();
+        button.className = "btn btn-block font-weight-bold";
+        button.style.backgroundColor = bgColor;
+        button.style.color = "white";
+        return button;
+    }
+
+    function resetColumn(columnElement) {
+        let allButtons = columnElement.querySelectorAll(".btn");
+        allButtons.forEach(btn => btn.classList.add("d-none"));
+    }
+
+    function createButtonsFromLocalStorage() {
+        // Obtener datos del localStorage
+        const dataString = localStorage.getItem('botonesData');
+        if (!dataString) return;  // Si no hay datos, salir
+
+        const data = JSON.parse(dataString).slice(1);  // Ignorar la primera fila
+
+        data.forEach(row => {
+            createDynamicButton(row);
+        });
+    }
+    
+    document.getElementById("exportModeloBotones").addEventListener("click", function() {
+        // Datos de ejemplo para exportar
+        const data = [
+            ["Code", "Color", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel"],
+            ["code1", "red", "group1 - text 1.1,group1 - text 1.2,btn1 text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"],
+            ["code2", "#ffc107", "group1 - text 1.1,group1 - text 1.2,btn2 text 1.3", "group2 - text 2.1,btn2 text 2.2,group2 -  text 2.3", "group3 - text 3.1,group3 - text 3.2,group3 - text 3.3,group3 - text 3.4"],
+            ["code3", "rgb(40, 167, 69)", "group1 - text 1.1,group1 - text 1.2,group1 - text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"]
+        ];
+    
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+        XLSX.writeFile(wb, 'modeloBotones.xlsx');
+    });
+</script>
+
+<!--ONLOAD-->
+<script>
+    window.onload = function() {
+        const autoSave = JSON.parse(localStorage.getItem('autoSave'));
+        // alert(autoSave);
+        if (autoSave !== null) {
+            document.getElementById('autoSaveCheckbox').checked = autoSave;
+        }
+
+        createButtonsFromLocalStorage();
+    }
+    
+</script>
+
+<!--BOTONES PLAYERS-->
+<script>
+
+    function guardarOrden(equipo) {
+        var order = [];
+        // debugger;
+        var buttons = document.getElementById(equipo).getElementsByClassName('jugador');
+        for (var i = 0; i < buttons.length; i++) {
+            order.push(buttons[i].getAttribute('data-jugador'));
+        }
+        // console.log("Guardando orden para " + equipo + ":", order);
+        localStorage.setItem(equipo + '-order', JSON.stringify(order));
+    }
+
+    function cargarOrdenEquipo(equipo) {
+        let equipoContainer = document.getElementById(equipo);
+        let ordenGuardado = localStorage.getItem(equipo + '-order');
+        if (ordenGuardado) {
+            ordenGuardado = JSON.parse(ordenGuardado);
+            
+            // Crear un array de botones basado en el orden guardado
+            let orderedButtons = [];
+            for (let i = 0; i < ordenGuardado.length; i++) {
+                let btn = document.querySelector(`[data-jugador="${ordenGuardado[i]}"]`);
+                if (btn) {
+                    orderedButtons.push(btn);
+                } else {
+                    // console.log("Botón no encontrado para:", ordenGuardado[i]);
+                }
+            }
+
+            // Limpiar el contenedor
+            equipoContainer.innerHTML = '';
+
+            // Agregar los botones ordenados al contenedor
+            for (let btn of orderedButtons) {
+                equipoContainer.appendChild(btn);
+            }
+        }
+    }
+
+    // Función para manejar la carga del archivo de jugadores
+    function handleJugadoresFile(e) {
+
+        localStorage.removeItem('jugadores');
+
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+    
+            const worksheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[worksheetName];
+    
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+            // Remover el encabezado
+            rows.shift();
+    
+            // Guardar en localStorage
+            localStorage.setItem('jugadores', JSON.stringify(rows));
+    
+            // console.log(rows);
+            // Cargar jugadores desde localStorage
+            loadJugadoresFromLocalStorage();
+        };
+        reader.readAsBinaryString(file);
+
+        if (document.getElementById('autoSaveCheckbox').checked) {
+            guardarEstado('no');
+        }
+    }
+    
+    // Función para cargar los jugadores desde localStorage y generar los botones
+    function loadJugadoresFromLocalStorage() {
+        const jugadoresData = localStorage.getItem('jugadores');
+        if (!jugadoresData) return;
+    
+        
+        const rows = JSON.parse(jugadoresData);
+    
+        // Borrar jugadores actuales
+        document.getElementById("equipo1").innerHTML = '';
+        document.getElementById("equipo2").innerHTML = '';
+    
+        // Crear botones para los jugadores
+        rows.forEach(row => {
+
+            // Jugadores del equipo 1 (Home)
+            if (row[0]) {
+
+                // let div = document.createElement("div");
+                let button = document.createElement("button");
+                 // Al crear botones de jugadores del equipo home:
+                button.dataset.equipo = "home";
+                button.innerText = row[0];
+                button.className = "btn btn-primary jugador mr-2 mb-2";
+                button.dataset.jugador = row[0];
+                // div.appendChild(button);
+                document.getElementById("equipo1").appendChild(button);
+            }
+    
+            // Jugadores del equipo 2 (Away)
+            if (row[1]) {
+                // let div = document.createElement("div");
+                let button = document.createElement("button");
+                // Al crear botones de jugadores del equipo away:
+                button.dataset.equipo = "away";
+                button.innerText = row[1];
+                button.className = "btn btn-secondary jugador mr-2 mb-2";
+                button.dataset.jugador = row[1];
+                // div.appendChild(button);
+                document.getElementById("equipo2").appendChild(button);
+            }
+        });
+
+        // Reconectar la lógica de selección de jugadores a los nuevos botones
+        attachJugadorLogic();
+        
+        // debugger;
+        // Inicialización de Sortable
+        var equipo1 = document.getElementById('equipo1');
+        // console.log("Jugadores después de cargar:", equipo1.innerHTML);  // Agregado para depuración
+
+        var sortable1 = Sortable.create(document.getElementById('equipo1'), {
+            onEnd: function(evt) {
+                // console.log("Reordenando jugador de equipo1");
+                guardarOrden('equipo1');
+            }
+        });
+        var sortable2 = Sortable.create(document.getElementById('equipo2'), {
+            onEnd: function(evt) {
+                // console.log("Reordenando jugador de equipo2");
+                guardarOrden('equipo2');
+            }
+        });
+        guardarOrden('equipo1');
+        guardarOrden('equipo2');
+        cargarOrdenEquipo('equipo1');
+        cargarOrdenEquipo('equipo2');
+
+    }
+    
+    let isEditing = false;  // Bandera para saber si un jugador está en modo edición
+    function attachJugadorLogic() {
+        let jugadores = document.querySelectorAll(".jugador:not([data-attached])");
+        let jugadorPrincipalInput = document.getElementById("jugadorPrincipal");
+        let jugadorSecundarioInput = document.getElementById("jugadorSecundario");
+    
+        jugadores.forEach(jugador => {
+            jugador.dataset.attached = "true";  // Marcar el botón como "con lógica adjunta"
+    
+            jugador.addEventListener("click", function() {
+                if (isEditing) return;  // Si está en modo edición, no hacer nada
+    
+                // Si el jugador ya está seleccionado, deseleccionarlo
+                if (jugador.classList.contains("selected")) {
+                    jugador.classList.remove("selected");
+                    
+                    if (jugadorPrincipalInput.value === jugador.innerText) {
+                        jugadorPrincipalInput.value = "";
+                        jugadorSecundarioInput.value = "";
+                    } else if (jugadorSecundarioInput.value === jugador.innerText) {
+                        jugadorSecundarioInput.value = "";
+                    }
+    
+                } else {
+                    // Si no hay un jugador principal, este jugador se convierte en el principal
+                    if (!jugadorPrincipalInput.value) {
+                        jugador.classList.add("selected");
+                        jugadorPrincipalInput.value = jugador.innerText;
+
+                        // Aquí actualizamos el input del equipo del jugador principal
+                        const equipoJugadorPrincipalInput = document.getElementById("equipoJugadorPrincipal");
+                        
+                        let nombreEquipo = jugador.dataset.equipo === "home"
+                                            ? document.getElementById('nombreEquipo1').innerText 
+                                            : document.getElementById('nombreEquipo2').innerText;
+
+                        equipoJugadorPrincipalInput.value = nombreEquipo;
+                    } 
+                    // Si ya hay un jugador principal pero no hay jugador secundario
+                    // este jugador se convierte en el secundario
+                    else if (!jugadorSecundarioInput.value && jugadorPrincipalInput.value !== jugador.innerText) {
+                        jugador.classList.add("selected");
+                        jugadorSecundarioInput.value = jugador.innerText;
+                    }
+                }
+            });
+    
+            jugador.addEventListener("dblclick", function() {
+                isEditing = true;  // Establecer la bandera a verdadero porque estamos editando
+    
+                // Crear un input y darle el valor actual del botón
+                let input = document.createElement("input");
+                input.type = "text";
+                input.value = jugador.innerText;
+                input.className = "form-control";
+    
+                // Reemplazar el contenido del botón con el input
+                jugador.innerHTML = "";
+                jugador.appendChild(input);
+                input.focus();
+    
+                // Evento para manejar el final de la edición
+                input.addEventListener("blur", finishEditing);
+                input.addEventListener("keydown", function(e) {
+                    if (e.key === "Enter") {
+                        finishEditing();
+                    }
+                });
+    
+                function finishEditing() {
+                    // Actualizar el texto del botón
+                    const newValue = input.value;
+                    jugador.innerText = newValue;
+    
+                    // Actualizar localStorage
+                    updateJugadorInLocalStorage(jugador.dataset.jugador, newValue);
+                    jugador.dataset.jugador = newValue;
+    
+                    isEditing = false;  // Restablecer la bandera porque hemos terminado de editar
+                }
+            });
+        });
+    }
+    
+    function updateJugadorInLocalStorage(oldValue, newValue) {
+        const jugadoresData = JSON.parse(localStorage.getItem('jugadores'));
+        for (let row of jugadoresData) {
+            for (let i = 0; i < row.length; i++) {
+                if (row[i] === oldValue) {
+                    row[i] = newValue;
+                    break;
+                }
+            }
+        }
+        localStorage.setItem('jugadores', JSON.stringify(jugadoresData));
+    }
+    
+    
+    
+    // Iniciar la carga de jugadores desde localStorage al cargar la página
+    document.addEventListener("DOMContentLoaded", function() {
+        loadJugadoresFromLocalStorage();
+        
+    });
+    
+    document.getElementById("uploadJugadores").addEventListener("change", handleJugadoresFile);
+    
+    
+    document.getElementById("exportJugadores").addEventListener("click", function() {
+        exportToExcel('jugadores');
+    });
+    
+    document.getElementById("exportJugadores").addEventListener("click", function() {
+        const header = ["Home", "Away"];  // Puedes extender esto según tus necesidades
+        exportToExcel('jugadores', header);  // No hay encabezado para jugadores
+    });
+    
+    document.getElementById("exportBotones").addEventListener("click", function() {
+        // const header = ["Accion", "Color", "Nivel1", "Nivel2", "Nivel3", "Nivel4", "Nivel5", "Nivel6", "Nivel7", "Nivel8", "Nivel9"];  // Puedes extender esto según tus necesidades
+        exportToExcel('botonesData', null);
+    });
+    
+    document.getElementById("exportModeloJugadores").addEventListener("click", function() {
+        // Datos de ejemplo para exportar
+        const data = [
+            ["Home", "Away"],
+            ["PlayerHome 1", "PlayerAway 1"],
+            ["PlayerHome 2", "PlayerAway 2"],
+            ["PlayerHome 3", "PlayerAway 3"],
+            ["PlayerHome 4", "PlayerAway 4"],
+            ["PlayerHome 5", "PlayerAway 5"],
+            ["PlayerHome 6", "PlayerAway 6"],
+            ["PlayerHome 7", "PlayerAway 7"],
+            ["PlayerHome 8", "PlayerAway 8"],
+            ["PlayerHome 9", "PlayerAway 9"],
+            ["PlayerHome 10", "PlayerAway 10"],
+            ["PlayerHome 11", "PlayerAway 11"],
+            ["PlayerHome 12", "PlayerAway 12"],
+            ["PlayerHome 13", "PlayerAway 13"],
+            ["PlayerHome 14", "PlayerAway 14"],
+            ["PlayerHome 15", "PlayerAway 15"],
+            ["PlayerHome 16", "PlayerAway 16"],
+        ];
+    
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+        XLSX.writeFile(wb, 'modeloJugadores.xlsx');
+    });
+
+    
+    function exportToExcel(localStorageKey, header) {
+        let data = JSON.parse(localStorage.getItem(localStorageKey));
+        if (!data) {
+            alert("No hay datos para exportar.");
+            return;
+        }
+    
+        if (header) {
+            data = [header].concat(data);  // Inserta el encabezado al principio de los datos
+        }
+    
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, localStorageKey);
+    
+        XLSX.writeFile(wb, `${localStorageKey}.xlsx`);
+    }
+    
+</script>
+<!--FIN BOTONES DE JUGADORES-->
+
+<!--POST AND GET DATA BASE-->
+<script>
+    function enviarABaseDeDatos() {
+        // let registros = [];  // Aquí deberías obtener todos los registros de tu grilla
+
+        // Suponiendo que tienes una función que te devuelve todos los registros:
+        // registros = obtenerRegistrosDeLaGrilla();
+
+        const fecha = document.getElementById("fecha").value; // Asegúrate de tener un input con id "fecha"
+        const descripcion = document.getElementById("descripcion").value; // Asegúrate de tener un input con id "descripcion"
+        const matchID = document.getElementById("matchID").value;
+        const youtubeLink = document.getElementById("youtubeLink").value;
+        const codigoSesion = document.getElementById("codigoSesion").value;
+
+        // Validación
+        if (!fecha || !descripcion || !matchID) {
+            alert("Por favor, asegúrate de llenar todos los campos (fecha, descripción y matchID) antes de enviar.");
+            return;
+        }
+
+        // Mensaje de confirmación
+        const isConfirmed = confirm("¿Estás seguro de que quieres enviar esta información a la base de datos?");
+        if (!isConfirmed) {
+            return;
+        }
+
+        const tabla = document.getElementById('tablaRegistros');
+        const rows = tabla.querySelectorAll('tr');
+
+        let csvContent = "";
+
+        //tendria que agregar el id del partido, el link del partido, la descripcion, la fecha, el link del evento
+        csvContent += '"Id Partido","Link Partido","Descripción","Fecha","Link Evento","eventID","Team","Player","Secundary","code","group","text","Periodo","Mins","Secs","startX","startY","endX","endY","porX","porY","codigoSesion"';
+
+        csvContent += '\n';
+
+        for (let i = 0; i < rows.length; i++) {
+            
+            const cells = rows[i].querySelectorAll('td, th');
+
+            let linkYT = extraerURLFromOnclick(cells[0]);
+
+            csvContent += '"'+matchID+' "';
+            csvContent += ',';
+            csvContent += '"'+youtubeLink+'"';
+            csvContent += ',';
+            csvContent += '"'+descripcion+'"';
+            csvContent += ',';
+            csvContent += '"'+fecha+'"';
+            csvContent += ',';
+            csvContent += '"'+linkYT+'"';
+            
+            for (let j = 2; j < cells.length; j++) {
+                //si es cero metemos el link
+                if (j) csvContent += ',';
+                csvContent += '"' + cells[j].innerText + '"';
+            }
+            
+            csvContent += ',';
+            csvContent += '"'+codigoSesion+'"';
+
+            csvContent += '\n';
+        }
+
+        if (!csvContent) {
+            alert("No hay datos para exportar.");
+            return;
+        }
+        let registros = csvContent;
+
+        // if (header) {
+        //     registros = [header].concat(data);  // Inserta el encabezado al principio de los datos
+        // }
+        // debugger;
+
+        // alert(registros);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', './php/guardarEvents.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function() {
+            //alert(this.readyState);
+            if (this.readyState == 4 && this.status == 200) {
+                // Aquí capturamos la respuesta del servidor
+                console.log(this.responseText);
+            }
+        };
+        xhr.send(JSON.stringify(registros));
+        alert("Enviado a la base de datos con éxito!");
+    }
+
+    function GetDataMatch() {
+
+        let matchId = document.getElementById("matchID").value;
+
+        // Verificar que el matchId no esté vacío
+        if (!matchId) {
+            alert("Por favor, ingresa un código de sesión.");
+            return;
+        }
+        
+        // Realizar la solicitud AJAX
+        fetch(`./php/cargarDatosPartido.php?matchId=${matchId}`)
+        .then(response => response.text())
+        .then(text => {
+            // console.log("Respuesta del servidor:", text);
+            return JSON.parse(text);
+        })
+        .then(data => {
+            // Aquí procesas la información que recibes en 'data'
+            // Por ejemplo:
+            // console.log(data);
+            
+            let fechaTransformada = transformarFecha(data['fecha']);
+            document.getElementById("fecha").value = fechaTransformada;
+            //document.getElementById("fecha").value = data['fecha'];// Asegúrate de tener un input con id "fecha"
+            document.getElementById("descripcion").value = data['descripcioncompleta']; // Asegúrate de tener un input con id "descripcion"
+            document.getElementById("youtubeLink").value = data['linkvideocompleto'];
+            // document.getElementById("codigoSesion").value = data['descripcioncompleta'];
+
+            //si vuelve con jugadores actualizo los botones.
+            let respuesta = confirm("¿Desea actualizar la lista de jugadores también?");
+            // debugger;
+            if (respuesta) {
+                // localStorage.clear();
+                // Refrescar la página
+                localStorage.removeItem('jugadores');
+                localStorage.removeItem('equipo1-order');
+                localStorage.removeItem('equipo2-order');
+
+                let jugadoresLocales = data['jugadoresLocales'];
+                if (data['jugadoresLocales']){
+
+                    let jugadoresCombinados = combinarJugadores(data['jugadoresLocales'], data['jugadoresVisitantes']);
+                    // console.log(jugadoresCombinados);
+
+                    // Guardar en localStorage
+                    localStorage.setItem('jugadores', JSON.stringify(jugadoresCombinados));
+                                
+                    guardarOrden('equipo1');
+                    guardarOrden('equipo2');
+                    // Cargar jugadores desde localStorage
+                    loadJugadoresFromLocalStorage();
+                }
+            
+                if (document.getElementById('autoSaveCheckbox').checked) {
+                    guardarEstado('no');
+                }
+            } 
+
+             //si vuelve con jugadores actualizo los botones.
+             let respuesta2 = confirm("¿Desea actualizar la lista de eventos también?");
+
+            if (respuesta2) {
+                // localStorage.clear();
+                // Refrescar la página
+                // location.reload();
+            } 
+            
+            if (document.getElementById('autoSaveCheckbox').checked) {
+                    guardarEstado('no');
+                }
+
+        })
+        .catch(error => {
+            console.error("Hubo un error al cargar los datos del partido:", error);
+        });
+
+    }
+
+    function combinarJugadores(locales, visitantes) {
+        let maxLength = Math.max(locales.length, visitantes.length);
+        let combinados = [];
+
+        for (let i = 0; i < maxLength; i++) {
+            let jugadorLocal = locales[i] || '';
+            let jugadorVisitante = visitantes[i] || '';
+            combinados.push([jugadorLocal['descripcioncorta'], jugadorVisitante['descripcioncorta']]);
+        }
+
+        return combinados;
+    }
+
+
+
+
+    function transformarFecha(fechaOriginal) {
+        let partes = fechaOriginal.split("-");
+        return `${partes[2]}-${partes[1]}-${partes[0]}`;
+    }
+
+    function GetMatchID() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');  // Los meses van de 0 a 11, por eso sumamos 1
+        const day = String(date.getDate()).padStart(2, '0');
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const second = String(date.getSeconds()).padStart(2, '0');
+        const millisecond = String(date.getMilliseconds()).padStart(3, '0');
+        
+        const uniqueID = `${year}${month}${day}${hour}${minute}${second}${millisecond}`;
+
+        // Establece el valor en el input con id "matchID"
+        document.getElementById("matchID").value = uniqueID;
+
+        // alert(`${year}${month}${day}${hour}${minute}${second}${millisecond}`);
+        // document.getElementById('matchID') = `${year}${month}${day}${hour}${minute}${second}${millisecond}`;
+
+        return ;
+    }
+
+    function GetSesionID() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');  // Los meses van de 0 a 11, por eso sumamos 1
+        const day = String(date.getDate()).padStart(2, '0');
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const second = String(date.getSeconds()).padStart(2, '0');
+        const millisecond = String(date.getMilliseconds()).padStart(3, '0');
+        
+        const uniqueID = `${year}${month}${day}${hour}${minute}${second}${millisecond}`;
+
+        // Establece el valor en el input con id "matchID"
+        document.getElementById("codigoSesion").value = uniqueID;
+
+        // alert(`${year}${month}${day}${hour}${minute}${second}${millisecond}`);
+        // document.getElementById('matchID') = `${year}${month}${day}${hour}${minute}${second}${millisecond}`;
+
+        return ;
+    }
+</script>
+
+<!--BOTONES EVENT-->
+<!--BOTONES DE PLAYERS-->
+<script>
+    // var equipo1 = document.getElementById('equipo1');
+    
+    // var sortable = Sortable.create(equipo1, {
+    //     onEnd: function(evt) {
+    //         guardarOrden();
+    //     }
+    // });
+    
+    
+    // function guardarOrden() {
+    //     var order = [];
+    //     var buttons = equipo1.getElementsByClassName('jugador');
+    //     for (var i = 0; i < buttons.length; i++) {
+    //         order.push(buttons[i].getAttribute('data-jugador'));
+    //     }
+    //     localStorage.setItem('equipo1-order', JSON.stringify(order));
+    // }
+    
+    // function cargarOrden() {
+    //     let equipo1 = document.getElementById('equipo1');
+    //     let ordenGuardado = localStorage.getItem('equipo1-order');
+    //     // console.log("Orden guardado:", ordenGuardado);  // Agregado para depuración
+
+    //     if (ordenGuardado) {
+    //         ordenGuardado = JSON.parse(ordenGuardado);
+    //         for (let i = 0; i < ordenGuardado.length; i++) {
+    //             let btn = document.querySelector(`[data-jugador="${ordenGuardado[i]}"]`);
+    //             if (btn) {
+    //                 if (btn.parentElement !== equipo1) {
+    //                     equipo1.appendChild(btn.parentElement);
+    //                 }
+    //                 // equipo1.appendChild(btn.parentElement);  // Mueve el <div> que contiene el botón al final del contenedor
+    //             } else {
+    //                 console.log("Botón no encontrado para:", ordenGuardado[i]);  // Agregado para depuración
+    //             }
+    //         }
+    //     }
+    // }
+    
+    // cargarOrden();
+
+    // Verificar el orden actual
+    // var buttons = equipo1.getElementsByClassName('jugador');
+    // var currentOrder = [];
+    // for (var i = 0; i < buttons.length; i++) {
+    //     currentOrder.push(buttons[i].getAttribute('data-jugador'));
+    // }
+    // console.log("Orden actual:", currentOrder);
+
+
+    </script>
+    
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+
+
+</html>

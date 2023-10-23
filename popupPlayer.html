@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor YouTube</title>
+    <style>
+        /* Puedes agregar estilos específicos para el reproductor aquí */
+    </style>
+</head>
+<body>
+    <!-- Aquí va el contenedor del reproductor de YouTube -->
+    <div id="player"></div>
+
+    <!-- Carga la API de YouTube -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        var player;
+        
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        function onYouTubeIframeAPIReady() {
+            var videoId = getParameterByName('videoId'); // Aquí obtenemos el ID del video desde la URL.
+
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: videoId, 
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function pauseVideo() {
+            if (player) {
+                player.pauseVideo();
+            }
+        }
+
+        function playVideo() {
+            if (player) {
+                player.playVideo();
+            }
+        }
+
+
+        function onPlayerReady(event) {
+            // Aquí puedes añadir funcionalidad cuando el reproductor esté listo.
+            // Por ejemplo, puedes hacer que el video comience automáticamente.
+            event.target.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
+            // Aquí puedes añadir funcionalidad basada en cambios de estado del reproductor.
+            if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.PLAYING || event.data == YT.PlayerState.BUFFERING) {
+        
+                let currentTime = player.getCurrentTime();
+                
+                // Verificar si la ventana emergente está abierta y actualizar el tiempo del video en ella.
+                if (popup && !popup.closed) {
+                    popup.updateVideoTime(currentTime);
+                }
+            }
+        }
+
+        function updateVideoTime(seconds) {
+            if (player) {
+                player.seekTo(seconds, true);
+            }
+        }
+
+    </script>
+</body>
+</html>
