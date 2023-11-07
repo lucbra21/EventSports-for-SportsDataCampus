@@ -15,6 +15,9 @@
 <script src="./js/cdnjs.cloudflare.com_ajax_libs_Sortable_1.14.0_Sortable.min.js"></script>
 <!-- <script src="./plugins/fontawesome-free-6.4.2-web/js/all.min.js" crossorigin="anonymous"></script> -->
 
+<!-- Bootstrap and jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+
 
 
 <head>
@@ -24,21 +27,21 @@
     <style>
         #campo {
             position: relative;  /* Asegúrate de que el contenedor del campo tenga posición relativa */
-            width: 500px;        /* Un ancho fijo para el campo */
-            height: 300px;
+            /*width: 500px;         Un ancho fijo para el campo */
+            height: 200px;
             margin: 0 auto;      /* Centra el campo horizontalmente */
             background-image: url('./img/campo.png');
-            background-size: 500px 300px;  /* Tamaño fijo para la imagen de fondo */
+            background-size: 260px 170px;  /* Tamaño fijo para la imagen de fondo */
             background-repeat: no-repeat;
             
         }
 
 
         .area-accion {
-            width: 420px;  /* Ajusta al contenido */
-            height: 300px; /* Ajusta al contenido */
+            /*width: 420px;   Ajusta al contenido */
+            /*height: 300px; /* Ajusta al contenido */
             /* background-color: #e0e0e0; /* Color de fondo del área de acción */
-            padding: 5mm;
+            /* padding-right: 10mm; */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,14 +51,15 @@
         }
 
         #porteria {
-            width: 420px;  /* Ancho total, incluyendo la portería y el espacio alrededor */
-            height: 300px; /* Alto total, incluyendo la portería y el espacio por encima y por debajo */
+            width: 320px;  /* Ancho total, incluyendo la portería y el espacio alrededor */
+            height: 200px; /* Alto total, incluyendo la portería y el espacio por encima y por debajo */
             padding: 5mm; /* Esto efectivamente añade un "borde" al contenido interno */
             background-image: url('./img/porteria.png');
-            background-size: cover;
-            background-position: center;
+            background-size: 260px 170px;
+            /* background-position: center; */
+            background-repeat: no-repeat;
             background-clip: border-box; /* Esta propiedad asegura que el fondo (la imagen) también cubre el área del padding */
-            position: relative;  /* Asegúrate de que el contenedor del campo tenga posición relativa */
+            /* position: relative;  Asegúrate de que el contenedor del campo tenga posición relativa */
         }
 
         .linea-vertical {
@@ -119,7 +123,7 @@
 
         .youtube-player-container iframe {
             width: 100%;
-            height: 300px;
+            height: 600px;
         }
 
 
@@ -280,7 +284,47 @@
             padding: 10px; /* Espaciado opcional para dar un poco de margen */
         }
 
+        
     </style>
+
+<style>
+    /* Estilos para el footer */
+    .footer {
+      width: 100%;
+      background-color: #2E3035; /* Color de fondo */
+      color: white; /* Color del texto */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px; /* Espaciado interno */
+      /* position: absolute; */
+      bottom: 0;
+    }
+  
+    /* Estilos para el botón dentro del footer */
+    .footer button {
+      color: white; /* Color del texto del botón */
+      background-color: #007bff; /* Color de fondo del botón */
+      border: none;
+      padding: 10px 20px; /* Espaciado interno del botón */
+      cursor: pointer;
+      text-decoration: none;
+    }
+  
+    .footer img {
+      height: 50px; /* Altura del logo */
+    }
+  
+    /* Estilos para el enlace para remover subrayado y ajustar colores */
+    .footer a, .footer a:visited {
+      color: white; /* Color del enlace */
+      text-decoration: none; /* Remueve subrayado */
+    }
+  
+    .footer .version {
+      font-size: 1em; /* Tamaño del texto de la versión */
+    }
+  </style>
 </head>
 <body>
     
@@ -399,91 +443,41 @@
             <div class="col-md-12">
                 <div class="row">
                     <!-- Reproductor de YouTube -->
-                    <div class="col-md-4 mb-2">
-                        <div class="youtube-player-container bg-light p-2 rounded shadow-sm">
-                         <iframe id="youtubePlayer" src="https://www.youtube.com/embed/DEFAULT_VIDEO_ID?enablejsapi=1" frameborder="0" allowfullscreen></iframe> 
-                            <div id="player" style="display:none"></div>
-                        </div>
-                    </div>
-                
-                     <!-- Campograma -->
-                     <div class="col-md-4 mb-2 d-flex justify-content-center align-items-center">
-                        <div id="campo" onclick="registrarAccion(event)" class="w-100 p-2 rounded justify-content-center align-items-center">
-                            <!-- Ejemplo de un punto en el 50% del ancho y 50% de la altura del campo -->
-                            <!-- <div class="punto" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div> -->
-                            <!-- Puedes agregar más puntos con diferentes coordenadas `left` y `top` -->
-                        </div>
-                        <div class="row"><div id="porteriaX"></div></div>
-                        <input type="hidden" id="porteria_X" value="">
-                        <input type="hidden" id="porteria_Y" value="">
-                    </div>
-                
-                    <!-- Sección Derecha (Acciones y Jugadores) -->
-                    <div class="col-md-4 mb-2  d-flex justify-content-center align-items-center">
-                        <!-- Acciones http://35.171.105.109/SDC/SDCKL/botonera/campo.png -->
-                        
-                            <div class="container">
-                                <div id="porterias">
-                                    <div class="area-accion">
-                                        <div id="porteria" class="porteria" onclick="registrarAccionPorteria(event)" style="w-100 p-2 rounded justify-content-center align-items-center">
+                    <div class="col-md-8 mb-2">
+                        <div class="container">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" id="videoTabs" role="tablist">
+                              <li class="nav-item">
+                                <a class="nav-link active" id="video-link-tab" data-toggle="tab" href="#videoLink" role="tab" aria-controls="videoLink" aria-selected="true">Video Link</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="video-file-tab" data-toggle="tab" href="#videoFile" role="tab" aria-controls="videoFile" aria-selected="false">Video File</a>
+                              </li>
+                            </ul>
+                          
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                              <div class="tab-pane active" id="videoLink" role="tabpanel" aria-labelledby="video-link-tab">
+                                <div class="youtube-player-container bg-light p-2 rounded shadow-sm">
+                                    <iframe id="youtubePlayer" src="https://www.youtube.com/embed/DEFAULT_VIDEO_ID?enablejsapi=1" frameborder="0" allowfullscreen></iframe> 
+                                       <div id="player" style="display:none"></div>
+                                   </div>
+                              </div>
+                              <div class="tab-pane" id="videoFile" role="tabpanel" aria-labelledby="video-file-tab">
+                                <div>
+                                    <video id="videoPlayer" width="100%" height="100%" controls>
                                         
-                                        </div>
-                                    </div>
+                                        <source src="./video/video.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
                                 </div>
+                              </div>
                             </div>
-                            
-                    </div>
-                    
+                          </div>
 
-                </div>
-                
-            
-                    
-                 <!-- Botonera players-->
-                 <!-- Inputs para los jugadores seleccionados -->
-                 <div class="row justify-content-center align-items-center">
-                    <div class="col-6">
-                        <input type="text" id="jugadorPrincipal" placeholder="Jugador Principal" class="btn btn-block" style="text-align: right;">
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="jugadorSecundario" placeholder="Jugador Secundario" class="btn btn-block" style="text-align: left;">
-                    </div>
-                </div>
-                 <div class="row">
-                    
-                    <input type="hidden" id="equipoJugadorPrincipal" readonly>
+                        
 
-                    <div class="col-md-12">
-                        <div class="container-fluid mt-3 mb-3" style="display: inline-block;">
-                            <!-- Contenedor general -->
-                           
-                                <div class="row">
-                                   
-                                        <!-- Jugadores del Equipo 1 (Home) -->
-                                        <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5>
-                                        <div id="equipo1" class="col-md-12">
-                                            <!-- Los botones del equipo 1 se generarán aquí, uno debajo del otro -->
-                                        </div>
-                                   
-                                </div>
-                                <div class="row">
-                                  
-                                        <!-- Jugadores del Equipo 2 (Away) -->
-                                        <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5>
-                                        <div id="equipo2" class="col-md-12">
-                                            <!-- Los botones del equipo 2 se generarán aquí, uno debajo del otro -->
-                                        </div>
-                                  
-                                    
-                                </div>
-                                
-                                
-                            </div>
-        
-                    </div>
-                </div>
-
-                <!-- Botonera action -->
+                        <!-- Botonera action -->
                 <div class="row">
                     <div class="col-md-12">
                         <div class="bg-light p-2 rounded shadow-sm">
@@ -520,6 +514,101 @@
                         </div>
                     </div>
                 </div>
+                    </div>
+                
+                     <!-- Campograma -->
+                     <div class="col-md-4  " style="padding-left:0px">
+                        <div class="row">
+                            <div class="col-6  " style="padding-left:0px;padding-right:0px">
+                                <div id="campo" onclick="registrarAccion(event)" class="w-100 p-2 rounded justify-content-center align-items-center">
+                                    <!-- Ejemplo de un punto en el 50% del ancho y 50% de la altura del campo -->
+                                    <!-- <div class="punto" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div> -->
+                                    <!-- Puedes agregar más puntos con diferentes coordenadas `left` y `top` -->
+                                    <!-- Contenedor SVG -->
+                                    <svg id="svgCampo" style="width:100%; height:100%; position:absolute; top:0; left:0;"></svg>
+
+                                </div>
+                                <div class="row"><div id="porteriaX"></div></div>
+                                <input type="hidden" id="porteria_X" value="">
+                                <input type="hidden" id="porteria_Y" value="">
+                            </div>
+
+                            <div class="col-6 mb-2   ">
+                                <!-- Acciones http://35.171.105.109/SDC/SDCKL/botonera/campo.png -->
+                                
+                                   <!-- <div class="container">-->
+                                        <div id="porterias">
+                                            <div class="area-accion">
+                                                <div id="porteria" class="porteria" onclick="registrarAccionPorteria(event)" style="w-100 p-2 rounded justify-content-center align-items-center">
+                                                
+                                                </div>
+                                            </div>
+                                       </div>
+                                   <!--  </div>-->
+                                    
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 mb-2 ">
+                                <div class="row justify-content-center align-items-center">
+                                    <div class="col-6">
+                                        <input type="text" id="jugadorPrincipal" placeholder="Jugador Principal" class="btn btn-block" style="text-align: right;">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" id="jugadorSecundario" placeholder="Jugador Secundario" class="btn btn-block" style="text-align: left;">
+                                    </div>
+                                </div>
+                                 <div class="row">
+                                    
+                                    <input type="hidden" id="equipoJugadorPrincipal" readonly>
+                
+                                    <div class="col-md-12">
+                                        <div class="row mt-3 mb-3">
+                                            <!-- Contenedor general -->
+                                           
+                                                <div class="col-6">
+                                                   
+                                                        <!-- Jugadores del Equipo 1 (Home) -->
+                                                        <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5>
+                                                        <div id="equipo1" class="col-md-12 d-flex flex-wrap">
+                                                            <!-- Los botones del equipo 1 se generarán aquí, uno debajo del otro -->
+                                                        </div>
+                                                   
+                                                </div>
+                                                <div class="col-6">
+                                                  
+                                                        <!-- Jugadores del Equipo 2 (Away) -->
+                                                        <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5>
+                                                        <div id="equipo2" class="col-md-12 d-flex flex-wrap">
+                                                            <!-- Los botones del equipo 2 se generarán aquí, uno debajo del otro -->
+                                                        </div>
+                                                  
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                
+                    <!-- Sección Derecha (Acciones y Jugadores) -->
+                    
+                    
+
+                </div>
+
+               
+                    
+                 <!-- Botonera players-->
+                 <!-- Inputs para los jugadores seleccionados -->
+                 
+
+                
 
                 <!-- Grilla -->
                 <div class="row">
@@ -528,25 +617,25 @@
                             <table id="editableTable" class="display" style="width:100%">
 
                                 <thead class="bg-secondary text-white">
-                                    <tr style="text-align: center;">
-                                        <th ><i class="fas fa-play"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Edit" -->
-                                        <th ><i class="fas fa-trash"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Delete" -->
-                                        <th>eventID</th>
-                                        <th>Team</th>
-                                        <th>Player</th>
-                                        <th>Secundary</th>
-                                        <th>code</th>
-                                        <th>group</th>
-                                        <th>text</th>
-                                        <th>Periodo</th>
-                                        <th>Mins</th>
-                                        <th>Secs</th>
-                                        <th>startX</th>
-                                        <th>startY</th>
-                                        <th>endX</th>
-                                        <th>endY</th>
-                                        <th>porX</th>
-                                        <th>porY</th>
+                                    <tr >
+                                        <th style="text-align: center; "><i class="fas fa-play"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Edit" -->
+                                        <th style="text-align: center; "><i class="fas fa-trash"></i></th> <!-- Si no tienes FontAwesome, puedes reemplazar con "Delete" -->
+                                        <th style="text-align: center; ">eventID</th>
+                                        <th style="text-align: center; ">Team</th>
+                                        <th style="text-align: center; ">Player</th>
+                                        <th style="text-align: center; ">Secundary</th>
+                                        <th style="text-align: center; ">code</th>
+                                        <th style="text-align: center; ">group</th>
+                                        <th style="text-align: center; ">text</th>
+                                        <th style="text-align: center; ">Periodo</th>
+                                        <th style="text-align: center; ">Mins</th>
+                                        <th style="text-align: center; ">Secs</th>
+                                        <th style="text-align: center; ">startX</th>
+                                        <th style="text-align: center; ">startY</th>
+                                        <th style="text-align: center; ">endX</th>
+                                        <th style="text-align: center; ">endY</th>
+                                        <th style="text-align: center; ">porX</th>
+                                        <th style="text-align: center; ">porY</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaRegistros" class="text-center">
@@ -654,10 +743,15 @@
                             </div>
                         </div>
                     </div>
+
+                    
         </div>
 
-
+        
+        
     </div>
+    
+    
     
 <script>
 
@@ -682,9 +776,10 @@
 
         // if (!jugadorSeleccionado || !accionSeleccionada) {
         if (!accionSeleccionada) {
-            // alert("Por favor, selecciona un jugador y una acción.");
-            alert("Por favor, selecciona una acción.");
-            return;
+            // // alert("Por favor, selecciona un jugador y una acción.");
+            // descomentar estos dos
+            // alert("Por favor, selecciona una acción.");
+            // return;
         }
         // alert(event);
 
@@ -714,9 +809,23 @@
         // if (!event.target.classList.contains('punto')) {
         // mostrarPunto(x1, y1);
         // }
-        
-        mostrarPunto(coords.x, coords.y);
-        
+        // alert(x2)
+        // if(x2==''){
+        let color = 'gray';
+        if(document.getElementById("colorAccion").value){
+            color = document.getElementById("colorAccion").value;
+        } 
+        // alert(coords.x);
+        // alert(coords.y);
+        // alert(x2);
+        // alert(y2);
+        // alert(color);
+        dibujarLineaConFlechaOPunto(coords.x, coords.y, x2, y2, color);
+        // }else{
+        //     // mostrarPuntoEnd(x2, y2, 'white');
+        // }
+        // mostrarPunto(coords.x, coords.y, x2, y2);
+        // (x1, y1, x2, y2, color = 'red')
         // mostrarPuntoPorteria(por_x, por_y);
 
         // Añadir el registro a la grilla
@@ -919,53 +1028,59 @@
 
     let puntos = [];
 
-    function mostrarPunto(x, y) {
-    
-    const punto = document.createElement('div');
-    
-    let color = 'gray';
-    if(document.getElementById("colorAccion").value){
-        color = document.getElementById("colorAccion").value;
-    } 
-
-    punto.style.width = '10px';  // Hacer el punto más grande
-    punto.style.height = '10px';
-    punto.style.background = color; // Color según la acción
-    punto.style.position = 'absolute';
-    punto.style.left = `${x - 5}px`;  // Ajustar para que el punto esté centrado con el clic
-    punto.style.top = `${y - 5}px`;
-    punto.style.borderRadius = '50%';
-
-    // Guarda el punto
-    puntos.push({x: x, y: y, accion: document.getElementById("eventName").value, nombreJugador: document.getElementById("jugadorPrincipal").value, color: color});
-
-    punto.setAttribute('title', `${document.getElementById("jugadorPrincipal").value} - Acción: ${document.getElementById("eventName").value}`);  // Tooltip con detalles
-
-    const campo = document.getElementById('campo');
-    campo.appendChild(punto);
-}
-
-
     let isDragging = false;
     let startPoint = { x: 0, y: 0 };
     let endPoint = { x: 0, y: 0 };
     let porteriaPoint = { x: 0, y: 0 };
+
+    function mostrarPunto(x, y) {
     
-    document.getElementById("campo").addEventListener("mousedown", function(event) {
-        isDragging = true;
-        startPoint.x = event.offsetX;
-        startPoint.y = event.offsetY;
+        const punto = document.createElement('div');
+        
+        let color = 'gray';
+        if(document.getElementById("colorAccion").value){
+            color = document.getElementById("colorAccion").value;
+        } 
 
-        // Muestra el punto final en el campo.
-        //mostrarPuntoEnd(startPoint.x, startPoint.y, 'white');  // Aquí estoy usando azul para el punto final, pero puedes cambiar el color según prefieras.
+        // if(x2 == ''){ 
+            punto.style.width = '10px';  // Hacer el punto más grande
+            punto.style.height = '10px';
+            punto.style.background = color; // Color según la acción
+            punto.style.position = 'absolute';
+            punto.style.left = `${x - 5}px`;  // Ajustar para que el punto esté centrado con el clic
+            punto.style.top = `${y - 5}px`;
+            punto.style.borderRadius = '50%';
+        // }
 
-    });
+        
+
+        // Guarda el punto
+        puntos.push({x: x, y: y, accion: document.getElementById("eventName").value, nombreJugador: document.getElementById("jugadorPrincipal").value, color: color});
+
+        punto.setAttribute('title', `${document.getElementById("jugadorPrincipal").value} - Acción: ${document.getElementById("eventName").value}`);  // Tooltip con detalles
+
+        const campo = document.getElementById('campo');
+        campo.appendChild(punto);
+    }
+
+
+    
+    
+    // document.getElementById("campo").addEventListener("mousedown", function(event) {
+    //     isDragging = true;
+    //     startPoint.x = event.offsetX;
+    //     startPoint.y = event.offsetY;
+
+    //     // Muestra el punto final en el campo.
+    //     //mostrarPuntoEnd(startPoint.x, startPoint.y, 'white');  // Aquí estoy usando azul para el punto final, pero puedes cambiar el color según prefieras.
+
+    // });
     
     document.getElementById("campo").addEventListener("mousemove", function(event) {
         // if (isDragging) {
         //     // Si quieres hacer algo visual mientras arrastras, aquí es el lugar.
         // }
-        isDragging = true;
+        // isDragging = true;
     });
     
     const dibujos = {
@@ -977,33 +1092,49 @@
         localStorage.setItem('dibujos', JSON.stringify(dibujos));
     }
 
-    document.getElementById("campo").addEventListener("mouseup", function(event) {
-        if (isDragging) {
-            endPoint.x = event.offsetX;
-            endPoint.y = event.offsetY;
-    
-        // Dibuja la línea desde el punto de inicio al punto de fin
-        dibujarLinea(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+    document.getElementById("campo").addEventListener("mousedown", function(event) {
+        console.log('Mouse down event triggered'); // Esto te ayudará a depurar
+    event.preventDefault();
+    isDragging = true;
+    startPoint.x = event.offsetX;
+    startPoint.y = event.offsetY;
+    // Se agrega para evitar la propagación del evento y que se maneje en otro lado
+    event.stopPropagation();
+});
+
+document.getElementById("campo").addEventListener("mouseup", function(event) {
+    console.log('Mouse up event triggered'); // Esto te ayudará a depurar
+    event.preventDefault(); // Prevenga cualquier comportamiento predeterminado
+    if (isDragging) {
+        endPoint.x = event.offsetX;
+        endPoint.y = event.offsetY;
+
+        let color = 'gray';
+        if(document.getElementById("colorAccion").value){
+            color = document.getElementById("colorAccion").value;
+        } 
+
+        // Asegúrate de que las coordenadas de inicio y fin no son las mismas
+        if (startPoint.x !== endPoint.x || startPoint.y !== endPoint.y) {
+            // Solo dibuja si hay un movimiento real
+            dibujarLineaConFlechaOPunto(startPoint.x, startPoint.y, endPoint.x, endPoint.y, color);
+        }
 
         dibujos.lineas.push({
             x1: startPoint.x,
             y1: startPoint.y,
             x2: endPoint.x,
-            y2: endPoint.y
+            y2: endPoint.y,
+            color: color
             });
         guardarDibujo();
 
-            
-        // Muestra el punto final en el campo.
-        //mostrarPuntoEnd(endPoint.x, endPoint.y, 'blue');  // Aquí estoy usando azul para el punto final, pero puedes cambiar el color según prefieras.
+        isDragging = false;
+        event.stopPropagation(); // Detiene la propagación del evento
+    }
+});
 
-            // Aquí puedes procesar la información de arrastrar y soltar.
-            // Por ahora, simplemente voy a imprimir las coordenadas en la consola.
-            // console.log(`Started at (${startPoint.x}, ${startPoint.y}) and ended at (${endPoint.x}, ${endPoint.y})`);
-    
-            isDragging = false;
-        }
-    });
+
 
     function cargarDibujo() {
     const data = localStorage.getItem('dibujos');
@@ -1013,48 +1144,51 @@
         mostrarPunto(punto.x, punto.y, punto.color);
         });
         dibujosGuardados.lineas.forEach(linea => {
-        dibujarLinea(linea.x1, linea.y1, linea.x2, linea.y2);
+        // dibujarLinea(linea.x1, linea.y1, linea.x2, linea.y2);
+        dibujarLineaConFlechaOPunto(linea.x1, linea.y1, linea.x2, linea.y2, linea.color);
+        
         });
     }
     }
  
-    function mostrarPuntoEnd(x, y, color='gray') {
-        const punto = document.createElement('div');
-        punto.style.width = '10px';
-        punto.style.height = '10px';
-        punto.style.background = color;
-        punto.style.position = 'absolute';
-        punto.style.left = `${x - 5}px`;
-        punto.style.top = `${y - 5}px`;
-        punto.style.borderRadius = '50%';
 
-        // Si quieres agregar tooltips o más detalles al punto, hazlo aquí.
+    function dibujarLineaConFlechaOPunto(x1, y1, x2, y2, color = 'red') {
+        const svgns = "http://www.w3.org/2000/svg"; // Espacio de nombres para SVG
+        const svg = document.getElementById('svgCampo'); // Obtén la referencia al contenedor SVG
 
-        const campo = document.getElementById('campo');
-        campo.appendChild(punto);
+        // Verificar si las coordenadas de inicio y fin son iguales
+        if ((x1 === x2 && y1 === y2) || (x2=='' && y2=='')) {
+            // Dibujar un punto (círculo en SVG)
+            const circle = document.createElementNS(svgns, 'circle');
+            circle.setAttribute('cx', x1);
+            circle.setAttribute('cy', y1);
+            circle.setAttribute('r', '5'); // Radio del círculo
+            circle.setAttribute('fill', color);
+            svg.appendChild(circle);
+        } else {
+            
+            // Dibujar un punto (círculo en SVG)
+            const circle = document.createElementNS(svgns, 'circle');
+            circle.setAttribute('cx', x2);
+            circle.setAttribute('cy', y2);
+            circle.setAttribute('r', '5'); // Radio del círculo
+            circle.setAttribute('fill', color);
+            svg.appendChild(circle);
+
+            // Crea la línea con la punta de flecha
+            const line = document.createElementNS(svgns, 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+
+            svg.appendChild(line); // Agrega la línea al contenedor SVG
+        }
     }
 
-    function dibujarLinea(x1, y1, x2, y2, color = 'red') {
-        const campo = document.getElementById('campo');
-        const linea = document.createElement('div');
-        const longitud = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-        const angulo = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-        const transform = `rotate(${angulo}deg)`;
-
-        linea.style.background = color;
-        linea.style.width = `${longitud}px`;
-        linea.style.height = '2px';  // Grosor de la línea
-        linea.style.position = 'absolute';
-        linea.style.top = `${y1}px`;
-        linea.style.left = `${x1}px`;
-        linea.style.transform = transform;
-        linea.style.transformOrigin = '0% 0%';
-        linea.style.zIndex = 0;  // Asegúrate de que la línea esté debajo de los puntos
-        
-        campo.appendChild(linea);
-    }
-
-    
 </script>
 
 <!--PORTERIA-->
@@ -1091,7 +1225,7 @@
     function registrarAccionPorteria(event) {
         const porterias = document.getElementById("porterias");
         const porteriasRect = porterias.getBoundingClientRect();
-        let posX = Math.round(event.clientX - porteriasRect.left) - 25;
+        let posX = Math.round(event.clientX - porteriasRect.left) - 6;
         let posY = Math.round(event.clientY - porteriasRect.top) - 5;
 
         const porteriasWidth = porteriasRect.width;
@@ -1449,13 +1583,15 @@ let timerInterval = null;
     }
 
     window.addEventListener('message', function(event) {
-        if (event.data === 'play') {
-            // Llama a la función para reproducir el video.
-            player.playVideo();
-        } else if (event.data === 'pause') {
-            // Llama a la función para pausar el video.
-            player.pauseVideo();
-        }
+        
+        // if (event.data === 'play') {
+        //     // Llama a la función para reproducir el video.
+        //     player.playVideo();
+        // } else if (event.data === 'pause') {
+        //     // Llama a la función para pausar el video.
+        //     player.pauseVideo();
+        // }
+        
         // ... otros comandos que necesites.
     });
 
@@ -1490,56 +1626,54 @@ let timerInterval = null;
     });
 
     document.addEventListener('keydown', function(event) {
-        // debugger;
-        // console.log(player.getPlayerState());
-        const activeElement = document.activeElement;
+    const activeElement = document.activeElement;
 
-        if (activeElement && activeElement.id === "descripcion" && event.code === 'Space') {
-            // Si el foco está en el input "descripcion", permite que se inserte el espacio y no hagas nada más.
-            return;
+    if (activeElement && activeElement.id === "descripcion" && event.code === 'Space') {
+        // Permite que el espacio se inserte en el input "descripcion" y no hagas nada más.
+        return;
+    }
+
+    // Si el foco está en un botón con data-equipo="home" o "away", simplemente retornamos.
+    if ((activeElement.getAttribute('data-equipo') === 'home' || activeElement.getAttribute('data-equipo') === 'away') && event.code === 'Space') {
+        return;
+    }
+
+    if (event.code === 'Space') {
+        // Obtener los estados de reproducción de ambos reproductores.
+        var ytPlayerState = player && player.getPlayerState ? player.getPlayerState() : null;
+        
+
+        // Si el reproductor de YouTube está reproduciendo, pausarlo junto con el temporizador.
+        if (ytPlayerState === 1) {
+            player.pauseVideo();
+            stopTimer();
+        } else if (ytPlayerState === -1 || ytPlayerState === 2) {
+            // Si el reproductor de YouTube no está reproduciendo, inicia ambos: el video y el temporizador.
+            player.playVideo();
+            startTimer();
         }
 
-        // Si el foco está en un botón con data-equipo="home" o data-equipo="away", simplemente retornamos.
-        if ((document.activeElement.getAttribute('data-equipo') === 'home' || document.activeElement.getAttribute('data-equipo') === 'away') && event.code === 'Space') {
-            // alert('entro');
-            return;
-        }
-        // alert(ocument.activeElement.getAttribute('data-equipo'));
-        if (event.code === 'Space') {
-            if(player.getPlayerState()==1){
-                player.pauseVideo();
+        // Si el reproductor de video HTML5 está reproduciendo, pausarlo junto con el temporizador.
+        if (document.getElementById("youtubeLink").value == '') { //youtubeLink
+            var htmlVideoPlayer = document.getElementById('videoPlayer');
+            var htmlVideoPlayerState = htmlVideoPlayer && !htmlVideoPlayer.paused;
+
+            if (htmlVideoPlayerState) {
+                htmlVideoPlayer.pause();
                 stopTimer();
-                // Para pausar el video
-                // Verificar si la ventana emergente está abierta y pausar el video en ella.
-                if (popup && !popup.closed) {
-                    popup.pauseVideo();
-                }
-            }else{
-                if(player.getPlayerState()==-1){
-                    if (isTimerRunning()) {
-                        // console.log("El temporizador está en ejecución");
-                        stopTimer();
-                    } else {
-                        // console.log("El temporizador está detenido");
-                        startTimer();
-                    }
-                }else{
-                    player.playVideo();
-                    startTimer();
-
-                    // Para reproducir el video
-                    // Verificar si la ventana emergente está abierta y pausar el video en ella.
-                    if (popup && !popup.closed) {
-                        popup.playVideo();
-                    }
-                }
+            } else if (htmlVideoPlayer && htmlVideoPlayer.readyState >= 3) {
+                // Si el reproductor de video HTML5 no está reproduciendo y está listo, inicia ambos: el video y el temporizador.
+                htmlVideoPlayer.play();
+                startTimer();
             }
-            
-            event.preventDefault();
-            // alert('3');
         }
         
-    });
+
+        event.preventDefault();
+    }
+});
+
+
 
     function onPlayerStateChange(event) {
         // alert('3');
@@ -2250,7 +2384,7 @@ function extraerURLFromOnclick(tdElement) {
                  // Al crear botones de jugadores del equipo home:
                 button.dataset.equipo = "home";
                 button.innerText = row[0];
-                button.className = "btn btn-primary jugador mr-2 mb-2";
+                button.className = "btn btn-primary jugador mr-2 mb-2 flex-fill";
                 button.dataset.jugador = row[0];
                 // div.appendChild(button);
                 document.getElementById("equipo1").appendChild(button);
@@ -2263,7 +2397,7 @@ function extraerURLFromOnclick(tdElement) {
                 // Al crear botones de jugadores del equipo away:
                 button.dataset.equipo = "away";
                 button.innerText = row[1];
-                button.className = "btn btn-secondary jugador mr-2 mb-2";
+                button.className = "btn btn-secondary jugador mr-2 mb-2 flex-fill";
                 button.dataset.jugador = row[1];
                 // div.appendChild(button);
                 document.getElementById("equipo2").appendChild(button);
@@ -2756,9 +2890,27 @@ function extraerURLFromOnclick(tdElement) {
 
 
     </script>
-    
+ <script>
+    function playVideoFile(input) {
+      var file = input.files[0];
+      var videoPlayer = document.getElementById('videoPlayer');
+      videoPlayer.src = URL.createObjectURL(file);
+      videoPlayer.load();
+      videoPlayer.play();
+    }
+  </script>
+
     <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 
+
+
+<footer class="footer">
+    <img src="./img/logo.png" alt="Logo"> <!-- Asegúrate de reemplazar con la ruta correcta al logo -->
+    <a href="./bkp/bkp.zip" download="bkp.zip">
+      <button>Descargar Última Versión</button>
+    </a>
+    <div class="version">v1.0.0</div> <!-- Reemplaza con tu número de versión actual -->
+  </footer>
 
 </html>
