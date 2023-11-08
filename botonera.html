@@ -762,15 +762,6 @@
 
     function registrarAccion(event) {
 
-        // const coords = getRelativePosition(document.getElementById("campo"), event);
-        // Si el clic fue hecho en un punto existente
-        // if (event.target.classList.contains('punto')) {
-        //     // event.stopPropagation();
-        //     // return; // Salir de la función
-        //     startPoint.x = coords.x;
-        //     startPoint.y = coords.y;
-        // }
-
         accionSeleccionada = document.getElementById('eventName').value;
         jugadorSeleccionado = document.getElementById('jugadorPrincipal').value;
 
@@ -781,13 +772,11 @@
             // alert("Por favor, selecciona una acción.");
             // return;
         }
-        // alert(event);
+        
 
         const coords = getRelativePosition(document.getElementById("campo"), event);
-        // let x1 = startPoint.x;
-        // let y1 = startPoint.y;
-        let x1 = Math.round(coords.x);
-        let y1 = Math.round(coords.y);
+        let x1 = startPoint.x;
+        let y1 = startPoint.y;
         let x2 = '';
         let y2 = '';
         if((startPoint.x != endPoint.x) | (startPoint.y != endPoint.y)){
@@ -805,29 +794,13 @@
             por_y = porteriaPoint.y;
         }
         
-         // Si el clic fue hecho en un punto existente
-        // if (!event.target.classList.contains('punto')) {
-        // mostrarPunto(x1, y1);
-        // }
-        // alert(x2)
-        // if(x2==''){
         let color = 'gray';
         if(document.getElementById("colorAccion").value){
             color = document.getElementById("colorAccion").value;
         } 
-        // alert(coords.x);
-        // alert(coords.y);
-        // alert(x2);
-        // alert(y2);
-        // alert(color);
+       
         dibujarLineaConFlechaOPunto(coords.x, coords.y, x2, y2, color);
-        // }else{
-        //     // mostrarPuntoEnd(x2, y2, 'white');
-        // }
-        // mostrarPunto(coords.x, coords.y, x2, y2);
-        // (x1, y1, x2, y2, color = 'red')
-        // mostrarPuntoPorteria(por_x, por_y);
-
+        
         // Añadir el registro a la grilla
         agregarRegistroAGrilla(x1, y1, x2, y2, por_x, por_y);
         
@@ -1094,20 +1067,25 @@
 
     document.getElementById("campo").addEventListener("mousedown", function(event) {
         console.log('Mouse down event triggered'); // Esto te ayudará a depurar
-    event.preventDefault();
-    isDragging = true;
-    startPoint.x = event.offsetX;
-    startPoint.y = event.offsetY;
-    // Se agrega para evitar la propagación del evento y que se maneje en otro lado
-    event.stopPropagation();
-});
+        // event.preventDefault();
+        isDragging = true;
+        // debugger;
+        startPoint.x = event.offsetX;
+        startPoint.y = event.offsetY;
+        // Se agrega para evitar la propagación del evento y que se maneje en otro lado
+        // event.stopPropagation();
+    });
 
 document.getElementById("campo").addEventListener("mouseup", function(event) {
     console.log('Mouse up event triggered'); // Esto te ayudará a depurar
-    event.preventDefault(); // Prevenga cualquier comportamiento predeterminado
+    // event.preventDefault(); // Prevenga cualquier comportamiento predeterminado
+    // debugger;
     if (isDragging) {
+        
         endPoint.x = event.offsetX;
         endPoint.y = event.offsetY;
+        // console.log("mouseup event.offsetX:", event.offsetX);
+        // console.log("mouseup event.offsetY:", event.offsetY);
 
         let color = 'gray';
         if(document.getElementById("colorAccion").value){
@@ -1120,6 +1098,7 @@ document.getElementById("campo").addEventListener("mouseup", function(event) {
             dibujarLineaConFlechaOPunto(startPoint.x, startPoint.y, endPoint.x, endPoint.y, color);
         }
 
+        // debugger;
         dibujos.lineas.push({
             x1: startPoint.x,
             y1: startPoint.y,
@@ -1130,7 +1109,7 @@ document.getElementById("campo").addEventListener("mouseup", function(event) {
         guardarDibujo();
 
         isDragging = false;
-        event.stopPropagation(); // Detiene la propagación del evento
+        // event.stopPropagation(); // Detiene la propagación del evento
     }
 });
 
@@ -1261,7 +1240,7 @@ document.getElementById("campo").addEventListener("mouseup", function(event) {
 <script>
 
 
-let timerInterval = null;
+    let timerInterval = null;
     let elapsedTime = 0; // Tiempo transcurrido en segundos
 
     function startTimer() {
@@ -1543,8 +1522,6 @@ let timerInterval = null;
 
         }
 
-    
-
     function duplicarPantalla() {
         let link = document.getElementById("youtubeLink").value;
             let videoID = link.split("v=")[1];
@@ -1672,8 +1649,6 @@ let timerInterval = null;
         event.preventDefault();
     }
 });
-
-
 
     function onPlayerStateChange(event) {
         // alert('3');
