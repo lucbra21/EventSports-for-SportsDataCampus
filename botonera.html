@@ -138,7 +138,8 @@
 
         .nombre-equipo {
             font-weight: bold;
-            text-decoration: underline;
+            /* text-decoration: underline; */
+            width: 96%;
         }
 
         #editableTable {
@@ -569,7 +570,13 @@
                                                 <div class="col-6">
                                                    
                                                         <!-- Jugadores del Equipo 1 (Home) -->
-                                                        <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5>
+                                                        <!-- <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5> -->
+
+                                                        <!-- Jugadores del Equipo 1 (Home) -->
+                                                        <button id="nombreEquipo1" class="btn btn btn-primary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this)">
+                                                            Equipo 1
+                                                        </button>
+
                                                         <div id="equipo1" class="col-md-12 d-flex flex-wrap">
                                                             <!-- Los botones del equipo 1 se generarán aquí, uno debajo del otro -->
                                                         </div>
@@ -578,7 +585,11 @@
                                                 <div class="col-6">
                                                   
                                                         <!-- Jugadores del Equipo 2 (Away) -->
-                                                        <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5>
+                                                        <!-- <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5> -->
+                                                        <button id="nombreEquipo2" class="btn btn btn-secondary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this)">
+                                                            Equipo 2
+                                                        </button>
+
                                                         <div id="equipo2" class="col-md-12 d-flex flex-wrap">
                                                             <!-- Los botones del equipo 2 se generarán aquí, uno debajo del otro -->
                                                         </div>
@@ -2503,7 +2514,47 @@ function extraerURLFromOnclick(tdElement) {
         localStorage.setItem('jugadores', JSON.stringify(jugadoresData));
     }
     
+    function seleccionarEquipo(elemento) {
+
+        let jugadorPrincipalInput = document.getElementById("jugadorPrincipal");
+        let jugadorSecundarioInput = document.getElementById("jugadorSecundario");
+
+
+        if (elemento.classList.contains("selected")) {
+                    elemento.classList.remove("selected");
+                    
+                    if (jugadorPrincipalInput.value === elemento.innerText) {
+                        jugadorPrincipalInput.value = "";
+                        jugadorSecundarioInput.value = "";
+                    } else if (jugadorSecundarioInput.value === elemento.innerText) {
+                        jugadorSecundarioInput.value = "";
+                    }
     
+                } else {
+                    // Si no hay un jugador principal, este jugador se convierte en el principal
+                    if (!jugadorPrincipalInput.value) {
+                        elemento.classList.add("selected");
+                        jugadorPrincipalInput.value = elemento.innerText;
+
+                        // Aquí actualizamos el input del equipo del jugador principal
+                        const equipoJugadorPrincipalInput = document.getElementById("equipoJugadorPrincipal");
+
+                        let nombreEquipo = document.getElementById('nombreEquipo1').innerText;
+
+                        equipoJugadorPrincipalInput.value = nombreEquipo;
+                    }
+                    // Si ya hay un jugador principal pero no hay jugador secundario
+                    // este jugador se convierte en el secundario
+                    else if (!jugadorSecundarioInput.value && jugadorPrincipalInput.value !== elemento.innerText) {
+                        elemento.classList.add("selected");
+                        jugadorSecundarioInput.value = elemento.innerText;
+                    }
+                }
+
+
+        
+
+    }
     
     // Iniciar la carga de jugadores desde localStorage al cargar la página
     document.addEventListener("DOMContentLoaded", function() {
