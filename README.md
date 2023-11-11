@@ -1,4 +1,3 @@
-# botonera
 
 # Botonera
 
@@ -69,8 +68,8 @@ Las contribuciones son bienvenidas y apreciadas. Para contribuir:
 
 ## Créditos
 
-- [Tu nombre o nombre de la organización]
+- Sports Data Campus - Lucas Bracamonte
 
 ## Licencia
 
-Este proyecto está liberado bajo la Licencia [INSERTE LICENCIA AQUÍ] - vea el archivo LICENSE para más detalles.
+Este proyecto está liberado bajo la Licencia Sports Data Campus - vea el archivo LICENSE para más detalles.
