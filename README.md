@@ -73,3 +73,16 @@ Las contribuciones son bienvenidas y apreciadas. Para contribuir:
 ## Licencia
 
 Este proyecto está liberado bajo la Licencia Sports Data Campus - vea el archivo LICENSE para más detalles.
+
+document.getElementById("eventoSeleccionado").innerHTML = '';
+
+accionSeleccionada = document.getElementById('eventName').value;
+
+const dataString = localStorage.getItem('botonesData');
+        if (!dataString) return;  // Si no hay datos, salir
+
+        const data = JSON.parse(dataString).slice(1);  // Ignorar la primera fila
+
+        data.forEach(row => {
+            createDynamicButton(row);
+        });

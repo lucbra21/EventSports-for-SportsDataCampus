@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="./plugins/bootstrap-4.5.3/css/bootstrap.css">
 <link rel="stylesheet" href="./plugins/fontawesome-free-6.4.2-web/css/all.min.css">
 <link rel="stylesheet" type="text/css" href="./plugins/DataTables/datatables.css">
+<link rel="stylesheet" type="text/css" href="./plugins/sweetalert/sweetalert.css">
 
 <!-- JS -->
 <script src="./js/ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.min.js"></script>
@@ -13,6 +14,7 @@
 <script src="./plugins/bootstrap-4.5.3/js/bootstrap.min.js"></script>
 <script src="./js/cdnjs.cloudflare.com_ajax_libs_xlsx_0.16.9_xlsx.full.min.js"></script>
 <script src="./js/cdnjs.cloudflare.com_ajax_libs_Sortable_1.14.0_Sortable.min.js"></script>
+<script src="./plugins/sweetalert/sweetalert.min.js"></script>
 <!-- <script src="./plugins/fontawesome-free-6.4.2-web/js/all.min.js" crossorigin="anonymous"></script> -->
 
 <!-- Bootstrap and jQuery -->
@@ -285,6 +287,10 @@
             padding: 10px; /* Espaciado opcional para dar un poco de margen */
         }
 
+        .btn{
+            font-size: 0.5rem
+        }
+
         
     </style>
 
@@ -372,7 +378,7 @@
                             <!-- Sección de ID del Partido -->
                             <div class="col-md-1">
                                 <div class="form-group">
-                                    <label>Fecha Partido:</label>
+                                    <label>Fecha:</label>
                                     <div class="youtube-input-container d-flex align-items-center">
                                         <input type="date" id="fecha" placeholder="Fecha del partido" class="form-control mr-2">
                                     </div>
@@ -667,42 +673,29 @@
                         <div class="card-body">
                             <div class="row">
                                 
-                                    <div class="col-md-2" >
-                                        <div class="form-group">
-                                            <label>Código de la sesión</label>
-                                            <div class="d-flex ">
-                                                <input type="text" id="codigoSesion" placeholder="Código de la sesión" class="form-control ">
-                                                <button onclick="GetSesionID()" class="btn btn-info">
-                                                    <i class="fas fa-redo"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                        
-
                                 <div class="col-md-2">
                                     <div class="btn-group" role="group">
-                                        <label class="btn  btn-block">
-                                            <input type="checkbox" id="autoSaveCheckbox"> <br>Auto guardado
-                                        </label>
-
+                                        
                                         <!-- Botón de exportación con ícono -->
                                         <button onclick="descargarCSV()" class="btn btn-primary btn-block">
-                                            <i class="fas fa-file-download"></i><br>Grilla CSV
+                                            <i class="fas fa-file-download"></i><br>CSV
                                         </button>
 
                                        
                                     </div>
                                 </div>
-
-                                <div class="col-md-2">
+                                    
+                                <div class="col-md-4">
                                     <div class="btn-group" role="group">
                                         <!-- Botón de exportación con ícono -->
-                                        <button onclick="guardarEstado('si')" class="btn btn-primary btn-block">
+                                        <button onclick="guardarEstado('si')" class="btn btn-primary ">
                                             <i class="fas fa-save"></i><br>Guardar
                                         </button>
                                         <button onclick="blanquear()" class="btn btn-secondary" style="color: #fff;">
-                                            <i class="fas fa-trash"></i><br>Blanquear
+                                            <i class="fas fa-trash"></i><br>Blanquear Todo
+                                        </button>
+                                        <button onclick="blanquearCampo()" class="btn btn-secondary" style="color: #fff;">
+                                            <i class="fas fa-trash"></i><br>Blanquear Campo
                                         </button>
                                         <button onclick="enviarABaseDeDatos()" class="btn btn-secondary">
                                             <i class="fas fa-play"></i><br>Enviar
@@ -751,6 +744,27 @@
                                     </div>
                                 </div>
                 
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="btn-group" role="group">
+                                        <label class="btn  btn-block">
+                                            <input type="checkbox" id="autoSaveCheckbox"> <br>Auto guardado
+                                        </label>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-2" >
+                                    <div class="form-group">
+                                        <label>Código de la sesión</label>
+                                        <div class="d-flex ">
+                                            <input type="text" id="codigoSesion" placeholder="Código de la sesión" class="form-control ">
+                                            <button onclick="GetSesionID()" class="btn btn-info">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1615,8 +1629,11 @@ document.getElementById("campo").addEventListener("mouseup", function(event) {
 
     document.addEventListener('keydown', function(event) {
     const activeElement = document.activeElement;
-
-    if (activeElement && activeElement.id === "descripcion" && event.code === 'Space') {
+    
+    
+    
+    
+    if (activeElement && (activeElement.tagName.toLowerCase() === 'input') && event.code === 'Space') {
         // Permite que el espacio se inserte en el input "descripcion" y no hagas nada más.
         return;
     }
@@ -1625,6 +1642,106 @@ document.getElementById("campo").addEventListener("mouseup", function(event) {
     if ((activeElement.getAttribute('data-equipo') === 'home' || activeElement.getAttribute('data-equipo') === 'away') && event.code === 'Space') {
         return;
     }
+
+    // alert(event.code);
+    // if(event.key=='1'){
+    //     debugger;
+    //     document.getElementById('inputEvento').value = 'Falta';
+
+        const dataString = localStorage.getItem('botonesData');
+        if (!dataString) return;  // Si no hay datos, salir
+
+        const data = JSON.parse(dataString).slice(1);  // Ignorar la primera fila
+
+        data.forEach(row => {
+            if(event.key==row[1]){
+
+                let dataRow=row;
+                resetBotonera(); // Oculta todos los botones
+            
+                document.getElementById("inputEvento").value = dataRow[0]; // Guarda el evento seleccionado en el input
+
+                // Mover el botón del evento a la sección específica
+                // const eventoSeleccionado = document.getElementById("eventoSeleccionado");
+                // eventoSeleccionado.innerHTML = ''; // Limpia cualquier botón anterior
+                // eventoSeleccionado.appendChild(boton);
+
+                let col = document.createElement("div");
+                col.className = "col-md-3 mb-3";
+
+                // Crear botón principal
+                let boton = createButton(dataRow[0], dataRow[2]); //text color
+
+                // boton.addEventListener("click", function() {
+                    // resetBotonera(); // Oculta todos los botones
+                    col.appendChild(boton);
+                    document.getElementById("botonera").appendChild(col);
+                
+                    document.getElementById("inputEvento").value = dataRow[0]; // Guarda el evento seleccionado en el input
+
+                    // Mover el botón del evento a la sección específica
+                    const eventoSeleccionado = document.getElementById("eventoSeleccionado");
+                    eventoSeleccionado.innerHTML = ''; // Limpia cualquier botón anterior
+                    eventoSeleccionado.appendChild(boton);
+
+                    for (let i = 2; i < dataRow.length; i++) {
+                        
+                        const optionsString = dataRow[i];
+                        const options = optionsString.split(',').map(option => option.trim());
+                        
+                        let newCol = document.createElement("div");
+                        newCol.className = "col-md-3 mb-3";
+                        
+                        // Crear y agregar un input en la parte superior para mostrar la acción seleccionada
+                        let inputAccion = document.createElement("input");
+                        inputAccion.type = "text";
+                        inputAccion.id = `inputAccionNivel${i-1}`;
+                        inputAccion.className = "form-control mb-2";
+                        inputAccion.readOnly = true;
+                        inputAccion.placeholder = `Nivel ${i-1} seleccionado`;
+                        if (i >2) {
+                            newCol.appendChild(inputAccion);
+                        }else{
+                            col.appendChild(inputAccion);
+                        }
+                        
+                        
+                        options.forEach(optionText => {
+                            let subButton = createButton(optionText);
+                            subButton.addEventListener("click", function() {
+                                // Asigna el valor del botón al input correspondiente
+                                inputAccion.value = optionText;
+                            });
+                            if (i > 2) {
+                                newCol.appendChild(subButton);
+                            }else{
+                                col.appendChild(subButton);
+                            }
+                            
+                        });
+
+                        document.getElementById("colorAccion").value = boton.style.backgroundColor;
+                        document.getElementById("eventName").value = boton.innerText;
+
+                        if (i > 2) {
+                        document.getElementById("botonera").appendChild(newCol);
+                        }else{
+                            document.getElementById("botonera").appendChild(col);
+                        }
+                        // document.getElementById("botonera").appendChild(newCol);
+                    }
+                // });
+
+                
+
+                // alert(row[0]);
+                // alert('hay shotcut');
+                // alert(row);
+            }
+            
+        });
+    //     alert('hacer todo lo que hace cuando hago click en algun evento.');
+    // }
 
     if (event.code === 'Space') {
         // Obtener los estados de reproducción de ambos reproductores.
@@ -1831,12 +1948,15 @@ function finalizarEdicion(elemento, input) {
     localStorage.setItem('partidoEstado', JSON.stringify(estadoPartido));
 
     if (mensajeOk=='si') {
-        alert("Estado del partido guardado exitosamente!");
+        swal("Éxito", "Estado del partido guardado exitosamente!", "success");
     }
     
 }
 
 function extraerURLFromOnclick(tdElement) {
+
+    // alert(tdElement.);
+    
     // Obtiene el valor del atributo 'onclick' del botón dentro del <td>
     let onclickValue = tdElement.querySelector("button").getAttribute("onclick");
     // Usa una expresión regular para extraer la URL
@@ -1998,17 +2118,58 @@ function extraerURLFromOnclick(tdElement) {
 <script>
 
     function blanquear() {
-        let respuesta = confirm("¿Estás seguro de que quieres blanquear (limpiar) todos los datos?");
 
-        if (respuesta) {
-            localStorage.clear();
-            // Refrescar la página
-            location.reload();
-        } else {
-            // El usuario canceló la acción
-            console.log("Blanqueo cancelado.");
-        }
+        swal({
+            title: "Piensalo bien..",
+            text: "¿Estás seguro de que quieres blanquear (limpiar) todos los datos?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Si, blanquealo!",
+            cancelButtonText: "No, estoy arrepentido!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    localStorage.clear();
+                    // Refrescar la página
+                    location.reload();
+                } else {
+                    swal("Cancelado", "Estás a salvo :) ¡Por ahora! (Blanqueo cancelado)", "info");
+                }
+            });
+
+        // let respuesta = confirm("¿Estás seguro de que quieres blanquear (limpiar) todos los datos?");
+
     }
+
+    function blanquearCampo() {
+
+        swal({
+            title: "Piensalo bien..",
+            text: "¿Estás seguro de que quieres blanquear los eventos en la cancha (limpiar)? Asegurate de haber guardado antes",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Si, blanquealo!",
+            cancelButtonText: "No, estoy arrepentido!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    localStorage.removeItem("dibujos");
+                    // Refrescar la página
+                    location.reload();
+                } else {
+                    swal("Cancelado", "Estás a salvo :) ¡Por ahora! (Blanqueo cancelado)", "info");
+                }
+            });
+
+        // let respuesta = confirm("¿Estás seguro de que quieres blanquear (limpiar) todos los datos?");
+
+        }
 
     function descargarCSV() {
 
@@ -2027,41 +2188,54 @@ function extraerURLFromOnclick(tdElement) {
             csvContent += '"Id Partido","Link Partido","Descripción","Fecha","Link Evento","eventID","Team","Player","Secundary","code","group","text","Periodo","Mins","Secs","startX","startY","endX","endY","porX","porY"';
 
             csvContent += '\n';
-
+            
+            let cantRegistros = 0;
             for (let i = 0; i < rows.length; i++) {
                 
                 const cells = rows[i].querySelectorAll('td, th');
+                // alert(cells.length);
+                if(cells.length>1){
 
-                let linkYT = extraerURLFromOnclick(cells[0]);
+                    cantRegistros = cantRegistros + 1;
 
-                csvContent += '"'+matchID+' "';
-                csvContent += ',';
-                csvContent += '"'+youtubeLink+'"';
-                csvContent += ',';
-                csvContent += '"'+descripcion+'"';
-                csvContent += ',';
-                csvContent += '"'+fecha+'"';
-                csvContent += ',';
-                csvContent += '"'+linkYT+'"';
-                
-                for (let j = 2; j < cells.length; j++) {
-                    //si es cero metemos el link
-                    if (j) csvContent += ',';
-                    csvContent += '"' + cells[j].innerText + '"';
+                    let linkYT = extraerURLFromOnclick(cells[0]);
+
+                    csvContent += '"'+matchID+' "';
+                    csvContent += ',';
+                    csvContent += '"'+youtubeLink+'"';
+                    csvContent += ',';
+                    csvContent += '"'+descripcion+'"';
+                    csvContent += ',';
+                    csvContent += '"'+fecha+'"';
+                    csvContent += ',';
+                    csvContent += '"'+linkYT+'"';
+
+                    for (let j = 2; j < cells.length; j++) {
+                        //si es cero metemos el link
+                        if (j) csvContent += ',';
+                        csvContent += '"' + cells[j].innerText + '"';
+                    }
                 }
+                
                 
                 csvContent += '\n';
             }
 
-            // Crear y descargar el archivo CSV
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const a = document.createElement('a');
-            
-            a.href = URL.createObjectURL(blob);
-            a.download = 'datos.csv';
-            a.click();
+            if(cantRegistros>0){
+                // Crear y descargar el archivo CSV
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const a = document.createElement('a');
+                
+                a.href = URL.createObjectURL(blob);
+                let nameFile = fecha + '_' + descripcion + ' (' + matchID + ').csv';
+                a.download = nameFile;
+                a.click();
 
-            URL.revokeObjectURL(a.href);
+                URL.revokeObjectURL(a.href);
+            }else{
+                swal("Presta atención", "No hay registros para descargar.", "warning"); //success
+            }
+            
         }
 
     document.getElementById('autoSaveCheckbox').addEventListener('change', function() {
@@ -2107,6 +2281,7 @@ function extraerURLFromOnclick(tdElement) {
     }
     
     function handleFile() {
+       
         resetBotonera();
         const input = document.getElementById('upload');
         const file = input.files[0];
@@ -2129,6 +2304,7 @@ function extraerURLFromOnclick(tdElement) {
     }
     
     function processWorkbook(workbook) {
+        // debugger;
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -2145,11 +2321,12 @@ function extraerURLFromOnclick(tdElement) {
     }
   
     function createDynamicButton(dataRow) {
+        // debugger;
         let col = document.createElement("div");
         col.className = "col-md-3 mb-3";
 
         // Crear botón principal
-        let boton = createButton(dataRow[0], dataRow[1]);
+        let boton = createButton(dataRow[0], dataRow[2]); //text color
 
         boton.addEventListener("click", function() {
             resetBotonera(); // Oculta todos los botones
@@ -2230,6 +2407,7 @@ function extraerURLFromOnclick(tdElement) {
     }
 
     function createButtonsFromLocalStorage() {
+        // debugger;
         // Obtener datos del localStorage
         const dataString = localStorage.getItem('botonesData');
         if (!dataString) return;  // Si no hay datos, salir
@@ -2244,10 +2422,10 @@ function extraerURLFromOnclick(tdElement) {
     document.getElementById("exportModeloBotones").addEventListener("click", function() {
         // Datos de ejemplo para exportar
         const data = [
-            ["Code", "Color", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel"],
-            ["code1", "red", "group1 - text 1.1,group1 - text 1.2,btn1 text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"],
-            ["code2", "#ffc107", "group1 - text 1.1,group1 - text 1.2,btn2 text 1.3", "group2 - text 2.1,btn2 text 2.2,group2 -  text 2.3", "group3 - text 3.1,group3 - text 3.2,group3 - text 3.3,group3 - text 3.4"],
-            ["code3", "rgb(40, 167, 69)", "group1 - text 1.1,group1 - text 1.2,group1 - text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"]
+            ["Code", "ShortCut", "Color", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel", "Nivel"],
+            ["code1", "1", "red", "group1 - text 1.1,group1 - text 1.2,btn1 text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"],
+            ["code2", "2", "#ffc107", "group1 - text 1.1,group1 - text 1.2,btn2 text 1.3", "group2 - text 2.1,btn2 text 2.2,group2 -  text 2.3", "group3 - text 3.1,group3 - text 3.2,group3 - text 3.3,group3 - text 3.4"],
+            ["code3", "3", "rgb(40, 167, 69)", "group1 - text 1.1,group1 - text 1.2,group1 - text 1.3", "group2 - text 2.1,group2 - text 2.2,group2 - text 2.3"]
         ];
     
         const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2611,7 +2789,8 @@ function extraerURLFromOnclick(tdElement) {
     function exportToExcel(localStorageKey, header) {
         let data = JSON.parse(localStorage.getItem(localStorageKey));
         if (!data) {
-            alert("No hay datos para exportar.");
+            // alert("No hay datos para exportar.");
+            swal("Presta atención", "No hay datos para exportar.", "warning");
             return;
         }
     
@@ -2645,15 +2824,29 @@ function extraerURLFromOnclick(tdElement) {
 
         // Validación
         if (!fecha || !descripcion || !matchID) {
-            alert("Por favor, asegúrate de llenar todos los campos (fecha, descripción y matchID) antes de enviar.");
+            // alert("Por favor, asegúrate de llenar todos los campos (fecha, descripción y matchID) antes de enviar.");
+            swal("Presta atención", "Por favor, asegúrate de llenar todos los campos (fecha, descripción y matchID) antes de enviar.", "warning");
             return;
         }
 
         // Mensaje de confirmación
-        const isConfirmed = confirm("¿Estás seguro de que quieres enviar esta información a la base de datos?");
-        if (!isConfirmed) {
-            return;
-        }
+        swal({
+            title: "Piensalo bien..",
+            text: "¿Estás seguro de que quieres enviar esta información a la base de datos?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Si, enviala!",
+            cancelButtonText: "No, estoy arrepentido!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+                if (!isConfirm) {
+                    return;
+                } 
+            });
+        
 
         const tabla = document.getElementById('tablaRegistros');
         const rows = tabla.querySelectorAll('tr');
@@ -2694,7 +2887,8 @@ function extraerURLFromOnclick(tdElement) {
         }
 
         if (!csvContent) {
-            alert("No hay datos para exportar.");
+            // alert("No hay datos para exportar.");
+            swal("Presta atención", "No hay datos para exportar.", "warning");
             return;
         }
         let registros = csvContent;
@@ -2716,7 +2910,8 @@ function extraerURLFromOnclick(tdElement) {
             }
         };
         xhr.send(JSON.stringify(registros));
-        alert("Enviado a la base de datos con éxito!");
+        // alert("Enviado a la base de datos con éxito!");
+        swal("Maravilloso", "Enviado a la base de datos con éxito!", "success"); //success
     }
 
     function GetDataMatch() {
@@ -2725,7 +2920,8 @@ function extraerURLFromOnclick(tdElement) {
 
         // Verificar que el matchId no esté vacío
         if (!matchId) {
-            alert("Por favor, ingresa un código de sesión.");
+            // alert("Por favor, ingresa un código de sesión.");
+            swal("Presta atención", "Por favor, ingresa un código de sesión.", "warning");
             return;
         }
         
@@ -2749,43 +2945,57 @@ function extraerURLFromOnclick(tdElement) {
             // document.getElementById("codigoSesion").value = data['descripcioncompleta'];
 
             //si vuelve con jugadores actualizo los botones.
-            let respuesta = confirm("¿Desea actualizar la lista de jugadores también?");
-            // debugger;
-            if (respuesta) {
-                // localStorage.clear();
-                // Refrescar la página
-                localStorage.removeItem('jugadores');
-                localStorage.removeItem('equipo1-order');
-                localStorage.removeItem('equipo2-order');
+            swal({
+            title: "Piensalo bien..",
+            text: "¿Desea actualizar la lista de jugadores también?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Si, lo deseo!",
+            cancelButtonText: "No, estoy arrepentido!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    // localStorage.clear();
+                    // Refrescar la página
+                    localStorage.removeItem('jugadores');
+                    localStorage.removeItem('equipo1-order');
+                    localStorage.removeItem('equipo2-order');
 
-                let jugadoresLocales = data['jugadoresLocales'];
-                if (data['jugadoresLocales']){
+                    let jugadoresLocales = data['jugadoresLocales'];
+                    if (data['jugadoresLocales']){
 
-                    let jugadoresCombinados = combinarJugadores(data['jugadoresLocales'], data['jugadoresVisitantes']);
-                    // console.log(jugadoresCombinados);
+                        let jugadoresCombinados = combinarJugadores(data['jugadoresLocales'], data['jugadoresVisitantes']);
+                        // console.log(jugadoresCombinados);
 
-                    // Guardar en localStorage
-                    localStorage.setItem('jugadores', JSON.stringify(jugadoresCombinados));
-                                
-                    guardarOrden('equipo1');
-                    guardarOrden('equipo2');
-                    // Cargar jugadores desde localStorage
-                    loadJugadoresFromLocalStorage();
-                }
+                        // Guardar en localStorage
+                        localStorage.setItem('jugadores', JSON.stringify(jugadoresCombinados));
+                                    
+                        guardarOrden('equipo1');
+                        guardarOrden('equipo2');
+                        // Cargar jugadores desde localStorage
+                        loadJugadoresFromLocalStorage();
+                    }
+                
+                    if (document.getElementById('autoSaveCheckbox').checked) {
+                        guardarEstado('no');
+                    }
+                } 
+            });
+
+
             
-                if (document.getElementById('autoSaveCheckbox').checked) {
-                    guardarEstado('no');
-                }
-            } 
 
-             //si vuelve con jugadores actualizo los botones.
-             let respuesta2 = confirm("¿Desea actualizar la lista de eventos también?");
+            //  //si vuelve con jugadores actualizo los botones.
+            //  let respuesta2 = confirm("¿Desea actualizar la lista de eventos también?");
 
-            if (respuesta2) {
-                // localStorage.clear();
-                // Refrescar la página
-                // location.reload();
-            } 
+            // if (respuesta2) {
+            //     // localStorage.clear();
+            //     // Refrescar la página
+            //     // location.reload();
+            // } 
             
             if (document.getElementById('autoSaveCheckbox').checked) {
                     guardarEstado('no');
@@ -2933,7 +3143,7 @@ function extraerURLFromOnclick(tdElement) {
 
 <footer class="footer">
     <img src="./img/logo.png" alt="Logo"> <!-- Asegúrate de reemplazar con la ruta correcta al logo -->
-    <a href="./bkp/bkp.zip" download="bkp.zip">
+    <a href="./bkp/bkp.zip" download="botonera.zip">
       <button>Descargar Última Versión</button>
     </a>
     <div class="version">v1.0.0</div> <!-- Reemplaza con tu número de versión actual -->
