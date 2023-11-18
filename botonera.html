@@ -985,7 +985,10 @@
            
             if (celdaEventoId) {
                 let idActual = parseInt(celdaEventoId.textContent.trim(), 10);
-           
+                
+                if (!Number.isNaN(idActual)) {
+                    idActual=0
+                }
                 return idActual + 1;
             }
         }
