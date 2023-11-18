@@ -982,11 +982,10 @@
         if (ultimaFila) {
             // Suponiendo que el ID del evento está en la segunda columna (ajusta el índice según sea necesario)
             let celdaEventoId = ultimaFila.querySelector("td:nth-child(3)"); 
-           
+            // console.log(celdaEventoId);
             if (celdaEventoId) {
                 let idActual = parseInt(celdaEventoId.textContent.trim(), 10);
-                
-                if (!Number.isNaN(idActual)) {
+                if (Number.isNaN(idActual)) {
                     idActual=0
                 }
                 return idActual + 1;
