@@ -296,7 +296,7 @@ body.stop-scrolling {
         position: absolute;
         width: 60px;
         height: 120px;
-        background: white;
+        background: #ffffff00;
         -webkit-transform: rotate(45deg);
         transform: rotate(45deg); }
       .sweet-alert .sa-icon.sa-success::before {
@@ -332,7 +332,7 @@ body.stop-scrolling {
       .sweet-alert .sa-icon.sa-success .sa-fix {
         width: 5px;
         height: 90px;
-        background-color: white;
+        background-color: ffffff00;
         position: absolute;
         left: 28px;
         top: 8px;

@@ -2534,6 +2534,7 @@ function extraerURLFromOnclick(tdElement) {
         }
     }
     
+    
     // Función para cargar los jugadores desde localStorage y generar los botones
     function loadJugadoresFromLocalStorage() {
         const jugadoresData = localStorage.getItem('jugadores');
@@ -2956,12 +2957,12 @@ function extraerURLFromOnclick(tdElement) {
             swal("Presta atención", "Por favor, ingresa un código de sesión.", "warning");
             return;
         }
-        
+        // debugger;
         // Realizar la solicitud AJAX
         fetch(`./php/cargarDatosPartido.php?matchId=${matchId}`)
         .then(response => response.text())
         .then(text => {
-            // console.log("Respuesta del servidor:", text);
+            console.log("Respuesta del servidor:", text);
             return JSON.parse(text);
         })
         .then(data => {
@@ -3015,6 +3016,7 @@ function extraerURLFromOnclick(tdElement) {
                         guardarEstado('no');
                     }
                 } 
+                swal("Exito", ("Se actualizarón los datos"), "success");
             });
 
 
@@ -3036,6 +3038,7 @@ function extraerURLFromOnclick(tdElement) {
         })
         .catch(error => {
             console.error("Hubo un error al cargar los datos del partido:", error);
+            swal("Error", ("Hubo un error al cargar los datos del partido: <br>" + error), "error");
         });
 
     }
