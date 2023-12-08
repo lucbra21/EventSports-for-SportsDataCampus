@@ -2347,7 +2347,7 @@ function extraerURLFromOnclick(tdElement) {
             eventoSeleccionado.innerHTML = ''; // Limpia cualquier botón anterior
             eventoSeleccionado.appendChild(boton);
 
-            for (let i = 2; i < dataRow.length; i++) {
+            for (let i = 3; i < dataRow.length; i++) {
                 const optionsString = dataRow[i];
                 const options = optionsString.split(',').map(option => option.trim());
                 
@@ -2357,10 +2357,10 @@ function extraerURLFromOnclick(tdElement) {
                 // Crear y agregar un input en la parte superior para mostrar la acción seleccionada
                 let inputAccion = document.createElement("input");
                 inputAccion.type = "text";
-                inputAccion.id = `inputAccionNivel${i-1}`;
+                inputAccion.id = `inputAccionNivel${i}`;
                 inputAccion.className = "form-control mb-2";
                 inputAccion.readOnly = true;
-                inputAccion.placeholder = `Nivel ${i-1} seleccionado`;
+                inputAccion.placeholder = `Nivel ${i} seleccionado`;
                 newCol.appendChild(inputAccion);
                 
                 options.forEach(optionText => {
@@ -2731,17 +2731,17 @@ function extraerURLFromOnclick(tdElement) {
         let jugadorSecundarioInput = document.getElementById("jugadorSecundario");
 
 
-        if (elemento.classList.contains("selected")) {
-                    elemento.classList.remove("selected");
+        // if (elemento.classList.contains("selected")) {
+        //             elemento.classList.remove("selected");
                     
-                    if (jugadorPrincipalInput.value === elemento.innerText) {
-                        jugadorPrincipalInput.value = "";
-                        jugadorSecundarioInput.value = "";
-                    } else if (jugadorSecundarioInput.value === elemento.innerText) {
-                        jugadorSecundarioInput.value = "";
-                    }
+        //             if (jugadorPrincipalInput.value === elemento.innerText) {
+        //                 jugadorPrincipalInput.value = "";
+        //                 jugadorSecundarioInput.value = "";
+        //             } else if (jugadorSecundarioInput.value === elemento.innerText) {
+        //                 jugadorSecundarioInput.value = "";
+        //             }
     
-                } else {
+        //         } else {
                     // Si no hay un jugador principal, este jugador se convierte en el principal
                     if (!jugadorPrincipalInput.value) {
                         elemento.classList.add("selected");
@@ -2760,7 +2760,7 @@ function extraerURLFromOnclick(tdElement) {
                         elemento.classList.add("selected");
                         jugadorSecundarioInput.value = elemento.innerText;
                     }
-                }
+                // }
 
 
         
