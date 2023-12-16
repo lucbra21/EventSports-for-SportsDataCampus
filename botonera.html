@@ -586,7 +586,7 @@
                                                         <!-- <h5 id="nombreEquipo1" class="nombre-equipo" ondblclick="editarNombreEquipo(this)" >Equipo 1</h5> -->
 
                                                         <!-- Jugadores del Equipo 1 (Home) -->
-                                                        <button id="nombreEquipo1" class="btn btn btn-primary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this)">
+                                                        <button id="nombreEquipo1" class="btn btn btn-primary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this, 'home')">
                                                             Equipo 1
                                                         </button>
 
@@ -599,7 +599,7 @@
                                                   
                                                         <!-- Jugadores del Equipo 2 (Away) -->
                                                         <!-- <h5 id="nombreEquipo2" class="nombre-equipo" ondblclick="editarNombreEquipo(this)">Equipo 2</h5> -->
-                                                        <button id="nombreEquipo2" class="btn btn btn-secondary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this)">
+                                                        <button id="nombreEquipo2" class="btn btn btn-secondary nombre-equipo mr-2 mb-2 flex-fill" ondblclick="editarNombreEquipo(this)" onclick="seleccionarEquipo(this, 'away')">
                                                             Equipo 2
                                                         </button>
 
@@ -2725,11 +2725,11 @@ function extraerURLFromOnclick(tdElement) {
         localStorage.setItem('jugadores', JSON.stringify(jugadoresData));
     }
     
-    function seleccionarEquipo(elemento) {
+    function seleccionarEquipo(elemento, localia) {
 
         let jugadorPrincipalInput = document.getElementById("jugadorPrincipal");
         let jugadorSecundarioInput = document.getElementById("jugadorSecundario");
-
+        // console.log(elemento);
 
         // if (elemento.classList.contains("selected")) {
         //             elemento.classList.remove("selected");
@@ -2748,10 +2748,20 @@ function extraerURLFromOnclick(tdElement) {
                         jugadorPrincipalInput.value = elemento.innerText;
 
                         // Aquí actualizamos el input del equipo del jugador principal
+                        // Aquí actualizamos el input del equipo del jugador principal
                         const equipoJugadorPrincipalInput = document.getElementById("equipoJugadorPrincipal");
+                        // alert(jugadorPrincipalInput.innerText);
+                        // alert(jugadorSecundarioInput.innerText);
+                        let nombreEquipo = localia === "home"
+                                            ? document.getElementById('nombreEquipo1').innerText 
+                                             : document.getElementById('nombreEquipo2').innerText;
 
-                        let nombreEquipo = document.getElementById('nombreEquipo1').innerText;
+                        // equipoJugadorPrincipalInput.value = nombreEquipo;
 
+                        // const equipoJugadorPrincipalInput = document.getElementById("equipoJugadorPrincipal");
+
+                        // let nombreEquipo = document.getElementById('nombreEquipo1').innerText;
+                        // alert(nombreEquipo);
                         equipoJugadorPrincipalInput.value = nombreEquipo;
                     }
                     // Si ya hay un jugador principal pero no hay jugador secundario
@@ -2761,10 +2771,7 @@ function extraerURLFromOnclick(tdElement) {
                         jugadorSecundarioInput.value = elemento.innerText;
                     }
                 // }
-
-
-        
-
+                    // alert('jjj');
     }
     
     // Iniciar la carga de jugadores desde localStorage al cargar la página
@@ -3178,7 +3185,7 @@ function extraerURLFromOnclick(tdElement) {
 
 <footer class="footer">
     <img src="./img/logo.png" alt="Logo"> <!-- Asegúrate de reemplazar con la ruta correcta al logo -->
-    <a href="./bkp/bkp.zip" download="botonera.zip">
+    <a href="https://github.com/lucbra21/botonera" target="_blank" >
       <button>Descargar Última Versión</button>
     </a>
     <div class="version">v1.2.0</div> <!-- Reemplaza con tu número de versión actual -->
