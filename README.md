@@ -1,5 +1,5 @@
 
-# Botonera
+# Event Sports for Sports Data Campus for Community
 
 Botonera es una herramienta de código abierto diseñada para la recolección de eventos en deportes. Permite la configuración personalizada de jugadores y eventos, y ofrece la posibilidad de analizar partidos en vivo a través de YouTube o desde archivos físicos.
 
