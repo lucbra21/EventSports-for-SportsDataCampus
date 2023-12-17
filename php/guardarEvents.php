@@ -5,7 +5,6 @@
 $host = 'localhost';
 $db   = 'db_sdckl';
 $user = 'root';
-// $pass = 'cGEDeIFNke95';
 $pass = 'root';
 $charset = 'utf8mb4';
 
