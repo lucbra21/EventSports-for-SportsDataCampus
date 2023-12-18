@@ -9,13 +9,13 @@ Botonera es una herramienta de código abierto diseñada para la recolección de
 
 https://youtu.be/dmyupb6dlQk
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/dmyupb6dlQk?si=djv2BXSPxDsYWta1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
+[![Alt text](https://img.youtube.com/vi/dmyupb6dlQk/0.jpg)](https://www.youtube.com/watch?v=dmyupb6dlQk)
 
 ### 2. Repositorio y estructura (Event Sports)
 
 https://youtu.be/2ldR7_qC3ro
 
+[![Alt text](https://img.youtube.com/vi/2ldR7_qC3ro/0.jpg)](https://www.youtube.com/watch?v=2ldR7_qC3ro)
 
 ### 3.  Sectores (Event Sports)
 
