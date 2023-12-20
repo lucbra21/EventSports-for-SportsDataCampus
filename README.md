@@ -51,9 +51,8 @@ Botonera es una herramienta de código abierto diseñada para la recolección de
 
 ### 11. Imagenes y Videos Local (Event Sports)
 
-
-[![Alt text](https://img.youtube.com/vi/LRSFaebFnqs/0.jpg)](https://www.youtube.com/watch?v=LRSFaebFnqs)
+[![Alt text](https://img.youtube.com/vi/_JlV6qroK-8/0.jpg)](https://www.youtube.com/watch?v=_JlV6qroK-8)
 
 ### 12. Conexión a MySql  (Event Sports)
 
-[![Alt text](https://img.youtube.com/vi/LRSFaebFnqs/0.jpg)](https://www.youtube.com/watch?v=LRSFaebFnqs)
+[![Alt text](https://img.youtube.com/vi/66mP-dS4rPg/0.jpg)](https://www.youtube.com/watch?v=66mP-dS4rPg)
