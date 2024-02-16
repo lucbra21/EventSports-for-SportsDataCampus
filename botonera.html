@@ -464,6 +464,10 @@
                                         <source src="./video/video.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
+                                    <!-- Control de velocidad de reproducción -->
+                                    <label for="speedControl">Speed: <span id="speedDisplay">1</span>x</label>
+                                    <input id="speedControl" type="range" min="0.25" max="20" value="1" step="0.25">
+                                    <button id="resetSpeed">Reset to 1x</button> 
                                 </div>
                               </div>
                             </div>
@@ -731,6 +735,29 @@
     </div>
 
 <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  var videoPlayer = document.getElementById('videoPlayer');
+  var speedControl = document.getElementById('speedControl');
+  var speedDisplay = document.getElementById('speedDisplay');
+  var resetSpeedButton = document.getElementById('resetSpeed'); // Botón para restablecer la velocidad
+
+  // Actualiza la velocidad de reproducción del video cuando el usuario cambia el control deslizante
+  speedControl.addEventListener('input', function() {
+    updateSpeed(this.value);
+  });
+
+  // Restablece la velocidad de reproducción a 1x cuando el usuario hace clic en el botón
+  resetSpeedButton.addEventListener('click', function() {
+    updateSpeed(1);
+    speedControl.value = 1; // Restablece el control deslizante a 1x
+  });
+
+  // Función para actualizar la velocidad de reproducción y el indicador
+  function updateSpeed(speed) {
+    videoPlayer.playbackRate = speed;
+    speedDisplay.textContent = speed; // Muestra el valor actual de la velocidad
+  }
+});
 
     const matchID = document.getElementById("matchID").value;
     const codigoSesion = document.getElementById("codigoSesion").value;
