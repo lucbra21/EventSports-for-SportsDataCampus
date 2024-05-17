@@ -56,3 +56,7 @@ Botonera es una herramienta de código abierto diseñada para la recolección de
 ### 12. Conexión a MySql  (Event Sports)
 
 [![Alt text](https://img.youtube.com/vi/66mP-dS4rPg/0.jpg)](https://www.youtube.com/watch?v=66mP-dS4rPg)
+
+### 13. Exportar XML e Importar a Nac Sports o cualquier software de video análisis  (Event Sports) Aporte by Victor Zandalinas
+
+[![Alt text](https://img.youtube.com/vi/O81bGUZJhiE/0.jpg)](https://youtu.be/O81bGUZJhiEhttps://youtu.be/O81bGUZJhiE)
