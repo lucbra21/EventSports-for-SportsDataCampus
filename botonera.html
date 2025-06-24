@@ -212,10 +212,47 @@
         }
         #botonera {
             position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         #botonera button {
-            margin-right: 10px;
+            margin: 5px;
+            flex: 1 1 120px;
+            min-width: 90px;
+            max-width: 220px;
+            font-size: 1.1em;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+
+        /* Responsividad para pantallas chicas */
+        @media (max-width: 900px) {
+            #botonera button {
+                font-size: 1em;
+                min-width: 80px;
+                max-width: 160px;
+                padding: 8px 0;
+            }
+        }
+        @media (max-width: 600px) {
+            #botonera {
+                flex-direction: column;
+                gap: 6px;
+                align-items: stretch;
+            }
+            #botonera button {
+                width: 100%;
+                min-width: unset;
+                max-width: unset;
+                font-size: 0.98em;
+                padding: 10px 0;
+            }
         }
 
         #botonera select {
@@ -1448,10 +1485,21 @@
     function loadYouTubeVideo(minStart,segStart,minEnd,segEnd) {
         // debugger;
             let link = document.getElementById("youtubeLink").value;
-            let videoID = link.split("v=")[1];
-            let ampersandPosition = videoID.indexOf('&');
-            if(ampersandPosition != -1) {
-                videoID = videoID.substring(0, ampersandPosition);
+            // Validar que el link sea de YouTube y contenga 'v='
+            let videoID = null;
+            if (link && link.includes("youtube.com") && link.includes("v=")) {
+                videoID = link.split("v=")[1];
+                if(videoID){
+                    let ampersandPosition = videoID.indexOf('&');
+                    if(ampersandPosition != -1) {
+                        videoID = videoID.substring(0, ampersandPosition);
+                    }
+                }
+            }
+
+            if (!videoID || videoID.trim() === "") {
+                alert("Por favor, ingresa un enlace válido de YouTube.");
+                return;
             }
 
             let embedURL = "https://www.youtube.com/embed/" + videoID;
@@ -1719,11 +1767,13 @@
 <script>
 
     function onYouTubeIframeAPIReady(ID_VIDEO) {
-
+      // Si no se pasa ID_VIDEO, usar un video por defecto
+      var defaultVideoId = 'dQw4w9WgXcQ'; // Puedes cambiar este por otro video si prefieres
+      var videoIdToUse = (typeof ID_VIDEO === 'string' && ID_VIDEO.trim() !== '') ? ID_VIDEO : defaultVideoId;
       player = new YT.Player('player', {
         height: '320',
         width: '512',
-        videoId: ID_VIDEO,
+        videoId: videoIdToUse,
         events: {
           'onReady': onPlayerReady,
           'onStateChange': onPlayerStateChange
